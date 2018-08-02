@@ -9,34 +9,35 @@ def create_board():
     ''' Sets up the board with the numbers, that will represent the objects'''
     new_board = \
     [ [0 for i in range(28)],
-      [0, 1, 1, 1, 1, 1, 9, 1, 1, 1, 1, 1, 0],
-      [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
-      [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
-      [0 for i in range(28)],
+      ([0] + [1 for i in range(12)] + [0]) * 2,
+      [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+      [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+      [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0], # replace 9 with 1
+      [0] + [1 for i in range(26)] + [0],
+      [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+      [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+      [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+      [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, None, 0, 0, None, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, None, 0, 0, None, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 0, 0, None, None, None, None, None, None, None, None, None, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, 0, 0, 0, 0, 0, 0, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, None, None, None, None, None, None, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+      [None, None, None, None, None, None, 1, 0, 0, None, 0, None, None, None, None, None, None, 0, None, 0, 0, 1, None, None, None, None, None, None],
+      [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, None, None, None, None, None, None, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+      [None, None, None, None, None, 0, 1, 0, 0, None, 0, 0, 0, 0, 0, 0, 0, 0, None, 0, 0, 1, 0, None, None, None, None],
+      [None, None, None, None, None, 0, 1, 0, 0, None, None, None, None, None, None, None, None, None, None, 0, 0, 1, 0, None, None, None, None, None],
+      [None, None, None, None, None, 0, 1, 0, 0, None, 0, 0, 0, 0, 0, 0, 0, 0, None, 0, 0, 1, 0, None, None, None, None, None],
+      [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, 0, 0, 0, 0, 0, 0, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+      ([0] + [1 for i in range(12)] + [0]) * 2,
+      [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+      [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+      [0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 9, None, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0],
+      [0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+      [0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+      [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+      [0] + [1 for i in range(26)] + [0],
       [0 for i in range(28)]]
 
     # 0 is a Wall object
@@ -60,42 +61,43 @@ class Board():
 
         self.Gamestate = create_board()
         self.gameObjects = set()
-        self.pacmanLocation = None
-        
+        self.pacman = None
+
     def new_level(self):
         ''' Called when a new level is needed. Alters the Gamestate (which consist of numbers)
             to consist of Pacman game objects. Then updateObjects() is called to fill the
             gameObjects set with all the objects that are on the board. And the initial location
             of Pacman is set. '''
         self.Gamestate = self._pacmanBoard( self.square_height(), self.square_width() )
-        self.updateObjects()
-        self.pacmanLocation = self.findPacman()
+        self._updateObjects()
+        self.pacman = self.pacmanLocation()
 
-            
+    
     def updateGamestate(self, x, y):
-        self.Gamestate[x][y] = self.pacmanLocation
+        self.validateMovement(x, y)
+        
+        if self.validatePath( self.pacman.direction ):
+            if self.pacman.direction == 'Left':
+                self.Gamestate[x][y+1] = None
 
-        if self.pacmanLocation.direction == 'Left':
-            self.Gamestate[x][y+1] = None
+            elif self.pacman.direction == 'Right':
+                self.Gamestate[x][y-1] = None
 
-        elif self.pacmanLocation.direction == 'Right':
-            self.Gamestate[x][y-1] = None
+            elif self.pacman.direction == 'Down':
+                self.Gamestate[x-1][y] = None
 
-        elif self.pacmanLocation.direction == 'Down':
-            self.Gamestate[x-1][y] = None
+            elif self.pacman.direction == 'Up':
+                self.Gamestate[x+1][y] = None
 
-        elif self.pacmanLocation.direction == 'Up':
-            self.Gamestate[x+1][y] = None
-
-    def updateObjects(self):
+    def _updateObjects(self):
         ''' Updates the gameObjects set to the objects that are inside the current Gamestate.
             Also updates where the current location of Pacman is on the board. '''
         self.gameObjects = { objs for rows in self.Gamestate for objs in rows if objs is not None }
-        self.pacmanLocation = self.findPacman()
-        self.updateGamestate(self.pacmanLocation.y, self.pacmanLocation.x)
+        self.pacman = self.pacmanLocation()
+        self.updateGamestate(self.pacman.y, self.pacman.x)
 
 
-    def findPacman(self) -> Pacman:
+    def pacmanLocation(self) -> Pacman:
         ''' Returns the Pacman object on the board. '''
         for rows in self.Gamestate:
             for gameObj in rows:
@@ -125,25 +127,37 @@ class Board():
             gameBoard.append(gameRow)
 
         return gameBoard
-
-    def validatePath(self) -> bool:
-        pacman = self.findPacman()
+    
+    def validatePath(self, direction) -> bool:
+        pacman = self.pacmanLocation()
         
-        if pacman.direction == 'Left':
+        if direction == 'Left':
             return type(self.Gamestate[pacman.y][pacman.x - 1]) != Wall
 
-        elif pacman.direction == 'Right':
+        elif direction == 'Right':
             return type(self.Gamestate[pacman.y][pacman.x + 1]) != Wall
 
-        elif pacman.direction == 'Down':
+        elif direction == 'Down':
             return type(self.Gamestate[pacman.y + 1][pacman.x]) != Wall
 
-        elif pacman.direction == 'Up':
+        elif direction == 'Up':
             return type(self.Gamestate[pacman.y - 1][pacman.x]) != Wall
 
+    def validateMovement(self, x, y):
+        '''
+        Checks for the case that Pacman crosses to the other side via one side,
+        which are when x == 14 and y == 0 or 27. If this is the case, the pacman
+        object changes it's x and y with the crossedBoundary method. Otherwise the
+        Gamestate is updated regularly.
+        '''
+        if (x == 14 and y == 0) or (x == 14 and y == 27):
+            self.pacman.crossedBoundary()
+            self.Gamestate[self.pacman.y][self.pacman.x] = self.pacman
 
-        
+        else:
+            self.Gamestate[x][y] = self.pacman
 
+    
     def square_height(self) -> float:
         ''' Returns the height of each individual square in the level. '''
         return ( self._window_height - self._window_border ) / len(self)

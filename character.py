@@ -11,7 +11,6 @@ class Character():
     def change_speed(self):
         pass
 
-
     def change_direction(self, direction):
         self.direction = direction
 
