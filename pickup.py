@@ -1,10 +1,17 @@
+from PIL.ImageTk import PhotoImage
+
+
 class Pickup():
 
     def __init__(self, x, y, boost = False):
         self.x = x
         self.y = y
-        
         self.boost = boost # default = false since only 4 boost and much more food
+
+        if self.boost:
+            self._image = PhotoImage(file='boost.png')
+        else:
+            self._image = PhotoImage(file='pickup.png')
 
 
 ## We can use this class to represent the Pickups like the little dots, and

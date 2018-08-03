@@ -1,4 +1,6 @@
 from character import Character
+from pickup import Pickup
+from PIL.ImageTk import PhotoImage
 
 class Pacman(Character):
 
@@ -8,12 +10,44 @@ class Pacman(Character):
         self.lives = 3
         self.lastDirection = 'Left'
         self.nextDirection = None
+        self._image = PhotoImage(file='pacmanL.png')
 
-    def increaseScore():
-        score += 10
+    def directionImage(self):
+        if self.direction == 'Left':
+            self._image = PhotoImage(file='pacmanL.png')
 
-    def displayScore():
-        return score
+        elif self.direction == 'Right':
+            self._image = PhotoImage(file='pacmanR.png')
+
+        elif self.direction == 'Down':
+            self._image = PhotoImage(file='pacmanD.png')
+
+        elif self.direction == 'Up':
+            self._image = PhotoImage(file='pacmanU.png')
+
+        # https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
+
+    def updateScore(self, gameObj):
+        ''' Updates Pacman's score when he obtains a pickup.
+            Regular Pickup are worth 10, while the boost are worth 50.
+            Enemies while in boost mode are worth 100. '''
+        if type(gameObj) == Pickup:
+            if gameObj.boost:
+                self.score += 50
+                self.invulnerability()
+            else:
+                self.score += 10
+                
+        elif type(gameObj) == Character:
+            self.score += 100
+
+        print(self.score)
+
+    def invulnerability(self):
+        pass
+
+    def displayScore() -> str:
+        return f'Score: {self.score}'
 
     def change_direction(self, direction):
         self.lastDirection = self.direction
