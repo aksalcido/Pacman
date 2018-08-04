@@ -1,6 +1,7 @@
 import tkinter as tk
 from board import Board
 from pacman import Pacman
+from enemy import Enemy
 from pickup import Pickup
 from wall import Wall
 
@@ -44,16 +45,16 @@ class Window():
                                                  (gameObj.y * total_height / total_height + 1) * total_height,
                                                  fill = 'blue', width = 0)
 
-                else:
+                else: # testing else
                     self._canvas.create_image( gameObj.x * total_width, gameObj.y * total_height, image = gameObj._image)
         
-            elif type(gameObj) == Pickup or type(gameObj) == Pacman:
+            elif type(gameObj) == Pickup or type(gameObj) == Pacman or type(gameObj) == Enemy:
                 self._canvas.create_image( gameObj.x * total_width + (total_width / 2),
                                            gameObj.y * total_height + (total_height / 2), image = gameObj._image)
 
 
     def _drawInterface(self) -> None:
-        self._scoreLabel['text'] = self.bord.pacman.displayScore()
+        self._scoreLabel['text'] = self.board.pacman.displayScore()
     
     def _draw_pacman(self): # not used yet
         self._canvas.move(self._pacman, 1, 0)
@@ -82,6 +83,7 @@ class Window():
         ''' Deletes the board and then redraws to prevent animation overlapping. '''
         self._canvas.delete(tk.ALL)
         self.draw_board()
+        self._drawInterface()
 
 
     def pacmanDirection(self, event: tk.Event) -> None:

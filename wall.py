@@ -1,6 +1,7 @@
 from PIL.ImageTk import PhotoImage
 
 class Wall:
+    wall = 0
 
     def __init__(self, x, y):
         self.x = x

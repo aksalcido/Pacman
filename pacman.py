@@ -3,9 +3,10 @@ from pickup import Pickup
 from PIL.ImageTk import PhotoImage
 
 class Pacman(Character):
+    pacman = 9
 
-    def __init__(self, x, y, speed = 1, color = "Yellow", direction = 'Left'):
-        Character.__init__(self, x, y, speed, color, direction)
+    def __init__(self, x, y, speed = 1, direction = 'Left'):
+        Character.__init__(self, x, y, speed, direction)
         self.score = 0
         self.lives = 3
         self.lastDirection = 'Left'
@@ -41,12 +42,10 @@ class Pacman(Character):
         elif type(gameObj) == Character:
             self.score += 100
 
-        print(self.score)
-
     def invulnerability(self):
         pass
 
-    def displayScore() -> str:
+    def displayScore(self) -> str:
         return f'Score: {self.score}'
 
     def change_direction(self, direction):

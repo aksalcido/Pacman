@@ -2,7 +2,9 @@ from PIL.ImageTk import PhotoImage
 
 
 class Pickup():
-
+    pickup = 1
+    boostUp = 3
+    
     def __init__(self, x, y, boost = False):
         self.x = x
         self.y = y
