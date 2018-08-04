@@ -1,30 +1,29 @@
 from character import Character
 from pickup import Pickup
-from PIL.ImageTk import PhotoImage
 
 class Pacman(Character):
     pacman = 9
-
-    def __init__(self, x, y, speed = 1, direction = 'Left'):
-        Character.__init__(self, x, y, speed, direction)
+    
+    def __init__(self, x, y, images, speed = 1, direction = 'Left'):
+        Character.__init__(self, x, y, images, speed, direction)
         self.score = 0
         self.lives = 3
         self.lastDirection = 'Left'
         self.nextDirection = None
-        self._image = PhotoImage(file='pacmanL.png')
+        self._image = self.images.return_image('pacmanL')
 
     def directionImage(self):
         if self.direction == 'Left':
-            self._image = PhotoImage(file='pacmanL.png')
+            self._image = self.images.return_image('pacmanL')
 
         elif self.direction == 'Right':
-            self._image = PhotoImage(file='pacmanR.png')
+            self._image = self.images.return_image('pacmanR')
 
         elif self.direction == 'Down':
-            self._image = PhotoImage(file='pacmanD.png')
+            self._image = self.images.return_image('pacmanD')
 
         elif self.direction == 'Up':
-            self._image = PhotoImage(file='pacmanU.png')
+            self._image = self.images.return_image('pacmanU')
 
         # https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
 

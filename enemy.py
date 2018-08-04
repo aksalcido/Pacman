@@ -1,30 +1,29 @@
 from character import Character
-from PIL.ImageTk import PhotoImage
 
 class Enemy(Character):
     inky   = 5
     blinky = 6
     pinky  = 7
     clyde  = 8
-
-    def __init__(self, x, y, enemyType, speed = 1, direction = None):
-        Character.__init__(self, x, y, speed, direction)
+    
+    def __init__(self, x, y, enemyType, images, speed = 1, direction = None):
+        Character.__init__(self, x, y, images, speed, direction)
         self.enemyType = enemyType
         self.determineImage(enemyType)
         self.determineDirection(enemyType)
 
     def determineImage(self, enemyType):
         if enemyType == Enemy.inky:
-            self._image = PhotoImage(file='inky.png')
+            self._image = self.images.return_image('inky')
 
         elif enemyType == Enemy.blinky:
-            self._image = PhotoImage(file='blinky.png')
+            self._image = self.images.return_image('blinky')
 
         elif enemyType == Enemy.pinky:
-            self._image = PhotoImage(file='pinky.png')
+            self._image = self.images.return_image('pinky')
 
         elif enemyType == Enemy.clyde:
-            self._image = PhotoImage(file='clyde.png')
+            self._image = self.images.return_image('clyde')
         
     
     def determineDirection(self, enemyType):

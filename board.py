@@ -1,3 +1,4 @@
+from gameImage import GameImage
 from pacman import Pacman
 from pickup import Pickup
 from enemy import Enemy
@@ -13,6 +14,7 @@ class Board():
 
         self.Gamestate = Board.create_board()
         self.gameObjects = set()
+        self.images = GameImage()
         self.pacman = None
 
     def new_level(self):
@@ -67,23 +69,23 @@ class Board():
             for j in range(len(self[i])):
                 # 0
                 if self[i][j] == Wall.wall:
-                    gameRow.append( Wall(j, i) )
+                    gameRow.append( Wall(j, i, self.images) )
 
                 # 1
                 elif self[i][j] == Pickup.pickup:
-                    gameRow.append( Pickup(j, i) )
+                    gameRow.append( Pickup(j, i, self.images) )
 
                 # 3
                 elif self[i][j] == Pickup.boostUp:
-                    gameRow.append( Pickup(j, i, True) )
+                    gameRow.append( Pickup(j, i, self.images, True) )
 
                 # 5, 6, 7, 8
                 elif self[i][j] == Enemy.inky or self[i][j] == Enemy.blinky or self[i][j] == Enemy.pinky or self[i][j] == Enemy.clyde:
-                    gameRow.append( Enemy(j, i, self[i][j]) )
+                    gameRow.append( Enemy(j, i, self[i][j], self.images) )
 
                 # 9
                 elif self[i][j] == Pacman.pacman:
-                    gameRow.append( Pacman(j, i) )
+                    gameRow.append( Pacman(j, i, self.images) )
 
                 else:
                     gameRow.append( None )
