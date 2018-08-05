@@ -1,4 +1,3 @@
-from gameImage import GameImage
 from pacman import Pacman
 from pickup import Pickup
 from enemy import Enemy
@@ -7,14 +6,13 @@ from wall import Wall
 
 class Board():
 
-    def __init__(self, width, height, border):
+    def __init__(self, width, height, images):
         self._window_width = width
         self._window_height = height
-        self._window_border = border
 
-        self.Gamestate = Board.create_board()
+        self.Gamestate = None
         self.gameObjects = set()
-        self.images = GameImage()
+        self.images = images
         self.pacman = None
 
     def new_level(self):
@@ -22,10 +20,18 @@ class Board():
             to consist of Pacman game objects. Then updateObjects() is called to fill the
             gameObjects set with all the objects that are on the board. And the initial location
             of Pacman is set. '''
+        self.Gamestate = Board.create_board()
         self.Gamestate = self._pacmanBoard( self.square_height(), self.square_width() )
         self._updateObjects()
         self.pacman = self.pacmanLocation()
+        self.pacman.levelUp()
+        
+    def level_complete(self) -> bool:
+        ''' Returns true or false if the total pickups on the board is 0.
+            If 0 the level is complete, otherwise the game is still going. '''
+        total_pickups = { p for p in self.gameObjects if type(p) == Pickup }
 
+        return len(total_pickups) == 0
     
     def updateGamestate(self, x, y):
         #self.validateScore(x, y)
@@ -50,7 +56,6 @@ class Board():
         self.gameObjects = { objs for rows in self.Gamestate for objs in rows if objs is not None }
         self.pacman = self.pacmanLocation()
         self.updateGamestate(self.pacman.y, self.pacman.x)
-
 
     def pacmanLocation(self) -> Pacman:
         ''' Returns the Pacman object on the board. '''
@@ -126,7 +131,7 @@ class Board():
 
     def square_height(self) -> float:
         ''' Returns the height of each individual square in the level. '''
-        return ( self._window_height - self._window_border ) / len(self)
+        return self._window_height / len(self)
 
     def square_width(self) -> float:
         '' 'Returns the width of each individual square in the level. '''

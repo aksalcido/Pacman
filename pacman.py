@@ -5,25 +5,26 @@ class Pacman(Character):
     pacman = 9
     
     def __init__(self, x, y, images, speed = 1, direction = 'Left'):
-        Character.__init__(self, x, y, images, speed, direction)
+        Character.__init__(self, x, y, speed, direction)
         self.score = 0
         self.lives = 3
+        self.level = 0
         self.lastDirection = 'Left'
         self.nextDirection = None
-        self._image = self.images.return_image('pacmanL')
+        self.directionImage(images)
 
-    def directionImage(self):
+    def directionImage(self, images):
         if self.direction == 'Left':
-            self._image = self.images.return_image('pacmanL')
+            self._image = images.return_image('pacmanL')
 
         elif self.direction == 'Right':
-            self._image = self.images.return_image('pacmanR')
+            self._image = images.return_image('pacmanR')
 
         elif self.direction == 'Down':
-            self._image = self.images.return_image('pacmanD')
+            self._image = images.return_image('pacmanD')
 
         elif self.direction == 'Up':
-            self._image = self.images.return_image('pacmanU')
+            self._image = images.return_image('pacmanU')
 
         # https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
 
@@ -41,6 +42,9 @@ class Pacman(Character):
         elif type(gameObj) == Character:
             self.score += 100
 
+    def levelUp(self) -> None:
+        self.level += 1
+    
     def invulnerability(self):
         pass
 
