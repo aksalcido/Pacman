@@ -12,7 +12,7 @@ class Pacman(Character):
         self.lastDirection = 'Left'
         self.nextDirection = None
         self.directionImage(images)
-
+    
     def directionImage(self, images):
         if self.direction == 'Left':
             self._image = images.return_image('pacmanL')
@@ -42,8 +42,9 @@ class Pacman(Character):
         elif type(gameObj) == Character:
             self.score += 100
 
-    def levelUp(self) -> None:
+    def levelUp(self, score) -> None:
         self.level += 1
+        self.score = score
     
     def invulnerability(self):
         pass

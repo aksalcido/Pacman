@@ -20,18 +20,28 @@ class Board():
             to consist of Pacman game objects. Then updateObjects() is called to fill the
             gameObjects set with all the objects that are on the board. And the initial location
             of Pacman is set. '''
+        score = self.currentScore()
         self.Gamestate = Board.create_board()
         self.Gamestate = self._pacmanBoard( self.square_height(), self.square_width() )
         self._updateObjects()
         self.pacman = self.pacmanLocation()
-        self.pacman.levelUp()
-        
+        self.pacman.levelUp(score)
+
     def level_complete(self) -> bool:
         ''' Returns true or false if the total pickups on the board is 0.
             If 0 the level is complete, otherwise the game is still going. '''
         total_pickups = { p for p in self.gameObjects if type(p) == Pickup }
 
         return len(total_pickups) == 0
+
+    def currentScore(self) -> int:
+        ''' Score is restored if advancing a level, and 0 if the beginning of the game. '''
+        if self.Gamestate is not None:
+            current_score = self.pacman.score
+        else:
+            current_score = 0
+
+        return current_score
     
     def updateGamestate(self, x, y):
         #self.validateScore(x, y)
@@ -63,41 +73,6 @@ class Board():
             for gameObj in rows:
                 if type(gameObj) == Pacman:
                     return gameObj
-
-    def _pacmanBoard(self, height, width) -> [list]:
-        ''' Takes the board of numbers, and easily sets up the coordinates of each object,
-            as manually typing each object with their coordinates would take way too long. '''
-        gameBoard = []
-        
-        for i in range(len(self)):
-            gameRow = []
-            for j in range(len(self[i])):
-                # 0
-                if self[i][j] == Wall.wall:
-                    gameRow.append( Wall(j, i, self.images) )
-
-                # 1
-                elif self[i][j] == Pickup.pickup:
-                    gameRow.append( Pickup(j, i, self.images) )
-
-                # 3
-                elif self[i][j] == Pickup.boostUp:
-                    gameRow.append( Pickup(j, i, self.images, True) )
-
-                # 5, 6, 7, 8
-                elif self[i][j] == Enemy.inky or self[i][j] == Enemy.blinky or self[i][j] == Enemy.pinky or self[i][j] == Enemy.clyde:
-                    gameRow.append( Enemy(j, i, self[i][j], self.images) )
-
-                # 9
-                elif self[i][j] == Pacman.pacman:
-                    gameRow.append( Pacman(j, i, self.images) )
-
-                else:
-                    gameRow.append( None )
-
-            gameBoard.append(gameRow)
-
-        return gameBoard
     
     def validatePath(self, direction) -> bool:
         pacman = self.pacmanLocation()
@@ -150,9 +125,44 @@ class Board():
         return self.Gamestate[key]
     
     def __iter__(self):
-        ''' Overrides the __iter__() so that we can use a for loop on the board object. '''
+        ''' Overrides the iter() method so that we can use a for loop on the board object. '''
         for row in self.Gamestate:
             yield row
+
+    def _pacmanBoard(self, height, width) -> [list]:
+        ''' Takes the board of numbers, and easily sets up the coordinates of each object,
+            as manually typing each object with their coordinates would take way too long. '''
+        gameBoard = []
+        
+        for i in range(len(self)):
+            gameRow = []
+            for j in range(len(self[i])):
+                # 0
+                if self[i][j] == Wall.wall:
+                    gameRow.append( Wall(j, i, self.images) )
+
+                # 1
+                elif self[i][j] == Pickup.pickup:
+                    gameRow.append( Pickup(j, i, self.images) )
+
+                # 3
+                elif self[i][j] == Pickup.boostUp:
+                    gameRow.append( Pickup(j, i, self.images, True) )
+
+                # 5, 6, 7, 8
+                elif self[i][j] == Enemy.inky or self[i][j] == Enemy.blinky or self[i][j] == Enemy.pinky or self[i][j] == Enemy.clyde:
+                    gameRow.append( Enemy(j, i, self[i][j], self.images) )
+
+                # 9
+                elif self[i][j] == Pacman.pacman:
+                    gameRow.append( Pacman(j, i, self.images) )
+
+                else:
+                    gameRow.append( None )
+
+            gameBoard.append(gameRow)
+
+        return gameBoard
 
     @classmethod
     def create_board(self):

@@ -15,7 +15,7 @@ class Window():
         object attribute initialized here. '''
         self._master = master
         self._width = 1000
-        self._height = 750
+        self._height = 850
         self._images = GameImage()      # All images used for Pacman are stored as a GameImage() object
 
         # All Tkinter Settings Initialized #
@@ -27,10 +27,7 @@ class Window():
         self._master.title('Pacman')
 
         # Arrow Keys Binded #
-        self._master.bind('<Left>', self.pacmanDirection)
-        self._master.bind('<Right>', self.pacmanDirection)
-        self._master.bind('<Up>', self.pacmanDirection)
-        self._master.bind('<Down>', self.pacmanDirection)
+        self._bindingsEnabled( True )
 
         # Pacman Board Initialized #
         self.board = Board(self._width, self._height, self._images)
@@ -43,15 +40,11 @@ class Window():
         
         for gameObj in self.board.gameObjects:
             if type(gameObj) == Wall:
-                if gameObj._image == None:
-                    self._canvas.create_rectangle(gameObj.x * total_width,
-                                                  gameObj.y * total_height,
-                                                 (gameObj.x * total_width / total_width + 1) * total_width,
-                                                 (gameObj.y * total_height / total_height + 1) * total_height,
-                                                 fill = 'blue', width = 0)
-
-                else: # testing else
-                    self._canvas.create_image( gameObj.x * total_width, gameObj.y * total_height, image = gameObj._image)
+                self._canvas.create_rectangle(gameObj.x * total_width,
+                                              gameObj.y * total_height,
+                                              (gameObj.x * total_width / total_width + 1) * total_width,
+                                              (gameObj.y * total_height / total_height + 1) * total_height,
+                                              fill = 'blue', width = 0)
         
             elif type(gameObj) == Pickup or type(gameObj) == Pacman or type(gameObj) == Enemy:
                 self._canvas.create_image( gameObj.x * total_width + (total_width / 2),
@@ -74,7 +67,7 @@ class Window():
         if self.board.validatePath( self.board.pacman.direction ):
             self.board.pacman.change_coords()
 
-        
+    
     def _adjust_board(self):
         ''' Deletes the board and then redraws to prevent animation overlapping. '''
         self._canvas.delete(tk.ALL)
@@ -82,7 +75,9 @@ class Window():
         self._drawInterface()
     
     def pacmanDirection(self, event: tk.Event) -> None:
-        ''' Will eventually change this to return the event and it leads to Pacman's direction. '''
+        ''' Function that allows the player to move Pacman. Directions have
+            to be validated in order to avoid stopped movement. nextDirection
+            and lastDirection allow smoother control of Pacman. '''
         self.board.pacman.change_direction(event.keysym)
 
         if self.board.validatePath( event.keysym ) == False:
@@ -92,10 +87,6 @@ class Window():
         else:
             self.board.pacman.directionImage( self._images )
             self.board.pacman.nextDirection = None
-
-    def gameloop(self):
-        self._master.after(125, self.gameloop) # delays before being called again
-        self.update()                        # function that updates the board object
 
     def update(self):
         '''
@@ -108,9 +99,45 @@ class Window():
         self.board._updateObjects()
 
         if self.board.level_complete():
-            self.board.new_level()
+            self.displayCompleted()
+            self._canvas.after(5000, self.update)
+        
+        else:
+            self._canvas.after(125, self.update)
+    
+    def displayCompleted(self):
+        ''' This functions is to add a properly transition between the completed
+            level and the loading screen. Mainly for visual purposes to appear nicer. '''
+        self.board.pacman.direction = None
+        self._bindingsEnabled(False)
+        self._canvas.after(750, self.loadingScreen)
+    
+    def loadingScreen(self):
+        self._canvas.delete(tk.ALL)
+        self._canvas.create_image( self._width / 2, self._height / 2,
+                                   image = self._images.return_image('loading_screen') )
+        
+        self._master.after(3500, self.levelAdvancement)
+
+    def levelAdvancement(self):
+        ''' Board loads up a new level once the previous level is completed. '''
+        self.board.new_level()
+        self._bindingsEnabled(True)
+
+    def _bindingsEnabled(self, enabled: bool) -> None:
+        if enabled:
+            self._master.bind('<Left>', self.pacmanDirection)
+            self._master.bind('<Right>', self.pacmanDirection)
+            self._master.bind('<Up>', self.pacmanDirection)
+            self._master.bind('<Down>', self.pacmanDirection)
+
+        else:
+            self._master.unbind('<Left>')
+            self._master.unbind('<Right>')
+            self._master.unbind('<Up>')
+            self._master.unbind('<Down>')
     
     def run(self):
-        self._master.after(100, self.gameloop) # put again here to allow mainloop() to still occur and also call gameloop
+        self._master.after(100, self.update) # put again here to allow mainloop() to still occur and also call gameloop
         self._master.mainloop()
 
