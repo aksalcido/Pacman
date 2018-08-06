@@ -15,17 +15,18 @@ class Board():
         self.images = images
         self.pacman = None
 
+    # Level Functions #
     def new_level(self):
         ''' Called when a new level is needed. Alters the Gamestate (which consist of numbers)
             to consist of Pacman game objects. Then updateObjects() is called to fill the
             gameObjects set with all the objects that are on the board. And the initial location
             of Pacman is set. '''
-        score = self.currentScore()
+        score, lives, level = self.currentStats()
         self.Gamestate = Board.create_board()
         self.Gamestate = self._pacmanBoard( self.square_height(), self.square_width() )
         self._updateObjects()
         self.pacman = self.pacmanLocation()
-        self.pacman.levelUp(score)
+        self.pacman.levelUp(score, lives, level)
 
     def level_complete(self) -> bool:
         ''' Returns true or false if the total pickups on the board is 0.
@@ -34,15 +35,19 @@ class Board():
 
         return len(total_pickups) == 0
 
-    def currentScore(self) -> int:
-        ''' Score is restored if advancing a level, and 0 if the beginning of the game. '''
+    def currentStats(self) -> tuple:
         if self.Gamestate is not None:
-            current_score = self.pacman.score
+            score = self.pacman.score
+            lives = self.pacman.lives
+            level = self.pacman.level + 1
         else:
-            current_score = 0
+            score = 0
+            lives = 3
+            level = 1
 
-        return current_score
-    
+        return score, lives, level
+
+    # Game Update Functions #
     def updateGamestate(self, x, y):
         #self.validateScore(x, y)
         self.validateMovement(x, y)
@@ -73,7 +78,8 @@ class Board():
             for gameObj in rows:
                 if type(gameObj) == Pacman:
                     return gameObj
-    
+
+    # Direction Validation Functions #
     def validatePath(self, direction) -> bool:
         pacman = self.pacmanLocation()
         
@@ -104,18 +110,20 @@ class Board():
             self.pacman.updateScore( self.Gamestate[x][y] )
             self.Gamestate[x][y] = self.pacman
 
+    # Individual Game Object Size Settings #
     def square_height(self) -> float:
         ''' Returns the height of each individual square in the level. '''
         return self._window_height / len(self)
 
     def square_width(self) -> float:
         '' 'Returns the width of each individual square in the level. '''
-        return self._window_width / self.board_width()
+        return self._window_width / self._board_width()
 
-    def board_width(self) -> int:
+    def _board_width(self) -> int:
         ''' Returns the width of the board, [0] as an index since all list inside are same length. '''
         return len(self.Gamestate[0])
 
+    # Overriding Functions #
     def __len__(self) -> int:
         ''' Overrides len() function, and also returns the height of the board. '''
         return len(self.Gamestate)
@@ -129,6 +137,7 @@ class Board():
         for row in self.Gamestate:
             yield row
 
+    # Board Creation Functions #
     def _pacmanBoard(self, height, width) -> [list]:
         ''' Takes the board of numbers, and easily sets up the coordinates of each object,
             as manually typing each object with their coordinates would take way too long. '''
@@ -166,7 +175,7 @@ class Board():
 
     @classmethod
     def create_board(self):
-        ''' Sets up the board with the numbers, that will represent the objects'''
+        #Sets up the board with the numbers, that will represent the objects
         new_board = \
         [ [0 for i in range(28)],
           ([0] + [1 for i in range(12)] + [0]) * 2,
@@ -203,5 +212,45 @@ class Board():
         
         return new_board
 
+    '''
+    ### USED PRIMARILY FOR TESTING PURPOSES ###
+    @classmethod
+    def create_board(self):
+        # Sets up the board with the numbers, that will represent the objects
+        new_board = \
+        [[0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+         [0 for i in range(28)],
+         [0 for i in range(28)],
+         [0 for i in range(28)],
+          [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 9, None, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0 for i in range(28)],
+          [0 for i in range(28)],
+         [0 for i in range(28)],
+         [0 for i in range(28)],
+         [0 for i in range(28)]]
+        
+        
+        return new_board
 
-
+'''
+    
