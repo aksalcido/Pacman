@@ -212,8 +212,8 @@ class Board():
         
         return new_board
 
-    '''
     ### USED PRIMARILY FOR TESTING PURPOSES ###
+    '''
     @classmethod
     def create_board(self):
         # Sets up the board with the numbers, that will represent the objects
@@ -251,6 +251,5 @@ class Board():
         
         
         return new_board
-
-'''
+    '''
     

@@ -92,7 +92,7 @@ class Window():
             then update the game as normal. '''
         if self.board.level_complete():
             self.displayCompleted()
-            self._canvas.after(5000, self.update)
+            self._canvas.after(5000, self.run)
             
         else:
             self._canvas.after(125, self.update)
@@ -116,6 +116,30 @@ class Window():
         self.board.new_level()
         self._bindingsEnabled(True)
 
+    def delayBeginning(self) -> None:
+        ''' Delays the game by a short amount of time with GUI to
+            inform the player when the game is going to start. This is
+            in order to prevent the game starting immediately and affecting
+            gameplay. '''
+        def three():
+            self._canvas.create_image(self._width / 2, self._height / 2,
+                                                  image = self._images.return_image('three') )
+
+        def two():
+            self._adjust_board()
+            self._canvas.create_image(self._width / 2, self._height / 2,
+                                                  image = self._images.return_image('two') )
+
+        def one():
+            self._adjust_board()
+            self._canvas.create_image(self._width / 2, self._height / 2,
+                                                  image = self._images.return_image('one') )
+        
+        self._adjust_board()
+        self._master.after(100, three)
+        self._master.after(700, two)
+        self._master.after(1300, one)
+    
     # (Player) Binding Functions #
     def pacmanDirection(self, event: tk.Event) -> None:
         ''' Function that allows the player to move Pacman. Directions have
@@ -185,6 +209,7 @@ class Window():
             self.checkPause()
 
     def run(self):
-        self._master.after(100, self.update) # put again here to allow mainloop() to still occur and also call gameloop
+        self.delayBeginning()
+        self._master.after(2000, self.update) # put again here to allow mainloop() to still occur and also call gameloop
         self._master.mainloop()
 
