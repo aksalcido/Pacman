@@ -1,4 +1,5 @@
 from character import Character
+from enemy import Enemy
 from pickup import Pickup
 
 class Pacman(Character):
@@ -6,20 +7,26 @@ class Pacman(Character):
     
     def __init__(self, x, y, images, speed = 1, direction = 'Left'):
         Character.__init__(self, x, y, speed, direction)
-        self.score = 0
-        self.lives = 3
-        self.level = 1
-        self.lastDirection = 'Left'
-        self.nextDirection = None
-        self.directionImage(images)
+        self.score, self.lives, self.level = 0, 3, 1
+        self.last_direction, self.next_direction = 'Left', None
+        self.invulnerable, self.death = False, False
+        self.direction_image(images)
+        self._startingPoint = (x, y)
 
         # https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
 
+    def restart_level(self):
+        ''' On death, original values are restored. '''
+        self.x, self.y = self._startingPoint
+        self.change_direction('Left')
+        self.next_direction = None
+    
     # Game Progression Functions #
-    def updateScore(self, gameObj):
-        ''' Updates Pacman's score when he obtains a pickup.
-            Regular Pickup are worth 10, while the boost are worth 50.
-            Enemies while in boost mode are worth 100. '''
+    def contact(self, gameObj):
+        ''' Updates Pacman's score when he comes into contact with another
+            game object, but also handles the two special cases if it's a
+            boost pickup, and if it's an enemy. '''
+
         if type(gameObj) == Pickup:
             if gameObj.boost:
                 self.score += 50
@@ -27,45 +34,55 @@ class Pacman(Character):
             else:
                 self.score += 10
             
-        elif type(gameObj) == Character:
-            self.score += 100
-    
-    def levelUp(self, score, lives, level) -> None:
-        self.score = score
-        self.lives = lives
-        self.level = level
+        elif type(gameObj) == Enemy:
+            if self.invulnerable:
+                self.score += 100
 
+            else:
+                self.death = True
+    
+    def level_up(self, score, lives, level) -> None:
+        self.score, self.lives, self.level = score, lives, level
+
+    def respawn(self, images):
+        self.restart_level()
+        self.direction_image( images )
+        self.death = False
+
+    def lose_life(self):
+        self.lives -= 1
+    
     def invulnerability(self):
-        pass
+        self.invulnerable = not self.invulnerable
+        
+    def out_of_lives(self):
+        return self.lives == 0
 
     # Direction Functions #
     def change_direction(self, direction):
-        self.lastDirection = self.direction
+        self.last_direction = self.direction
         self.direction = direction
     
-    def hasUpcomingDirection(self):
-        return self.nextDirection is not None
+    def has_upcoming_direction(self):
+        return self.next_direction is not None
         
-    def crossedBoundary(self):
+    def crossed_boundary(self):
         if self.direction == 'Left':
-            self.x = 27
-            self.y = 14
-
+            self.change_location(27, 14)
         else:
-            self.y = 14
-            self.x = 0
+            self.change_location(0, 14)
 
     # Display Functions #
-    def displayScore(self) -> str:
+    def display_score(self) -> str:
         return f'Score: {self.score}'
 
-    def displayLives(self) -> str:
+    def display_lives(self) -> str:
         return f'Lives: {self.lives}'
 
-    def displayLevel(self) -> str:
+    def display_level(self) -> str:
         return f'Level: {self.level}'
     
-    def directionImage(self, images):
+    def direction_image(self, images):
         if self.direction == 'Left':
             self._image = images.return_image('pacmanL')
 

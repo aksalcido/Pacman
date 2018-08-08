@@ -22,19 +22,19 @@ class Window():
         self._canvas = tk.Canvas(self._master, width = self._width, height = self._height, background="black")
         self._canvas.grid(row=0,column=0, sticky=tk.N)
         
-        self._scoreLabel = tk.Label(self._master, text = '0', font = ('Arial', 20))
-        self._levelLabel = tk.Label(self._master, text = '0', font = ('Arial', 20))
-        self._livesLabel = tk.Label(self._master, text = '0', font = ('Arial', 20))
+        self._score_label = tk.Label(self._master, text = '0', font = ('Arial', 20))
+        self._level_label = tk.Label(self._master, text = '0', font = ('Arial', 20))
+        self._lives_label = tk.Label(self._master, text = '0', font = ('Arial', 20))
         
-        self._scoreLabel.grid(row=1,column=0,sticky=tk.W)
-        self._levelLabel.grid(row=1,column=0,sticky=tk.N)
-        self._livesLabel.grid(row=1,column=0,sticky=tk.E)
+        self._score_label.grid(row=1,column=0,sticky=tk.W)
+        self._level_label.grid(row=1,column=0,sticky=tk.N)
+        self._lives_label.grid(row=1,column=0,sticky=tk.E)
         
         self._master.resizable(width=False, height=False)
         self._master.title('Pacman')
 
         # Arrow Keys Binded #
-        self._bindingsEnabled( True )
+        self._bindings_enabled( True )
         self._pause = False
 
         # Pacman Board Initialized #
@@ -43,80 +43,80 @@ class Window():
 
     # Drawing Functions #
     def _draw_board(self) -> None:
-        ''' Draws the board given the gameObjs in the board's set. '''
+        ''' Draws the board given the game_objs in the board's set. '''
         total_height = self.board.square_height() # Approximately ~24
         total_width = self.board.square_width()   # Approximately ~36
         
-        for gameObj in self.board.gameObjects:
-            if type(gameObj) == Wall:
-                self._canvas.create_rectangle(gameObj.x * total_width,
-                                              gameObj.y * total_height,
-                                              (gameObj.x * total_width / total_width + 1) * total_width,
-                                              (gameObj.y * total_height / total_height + 1) * total_height,
+        for game_obj in self.board.game_objects:
+            if type(game_obj) == Wall:
+                self._canvas.create_rectangle(game_obj.x * total_width,
+                                              game_obj.y * total_height,
+                                              (game_obj.x * total_width / total_width + 1) * total_width,
+                                              (game_obj.y * total_height / total_height + 1) * total_height,
                                               fill = 'blue', width = 0)
         
-            elif type(gameObj) == Pickup or type(gameObj) == Pacman or type(gameObj) == Enemy:
-                self._canvas.create_image( gameObj.x * total_width + (total_width / 2),
-                                           gameObj.y * total_height + (total_height / 2), image = gameObj._image)
+            elif type(game_obj) == Pickup or type(game_obj) == Pacman or type(game_obj) == Enemy:
+                self._canvas.create_image( game_obj.x * total_width + (total_width / 2),
+                                           game_obj.y * total_height + (total_height / 2), image = game_obj._image)
 
 
-    def _drawInterface(self) -> None:
-        self._scoreLabel['text'] = self.board.pacman.displayScore()
-        self._levelLabel['text'] = self.board.pacman.displayLevel()
-        self._livesLabel['text'] = self.board.pacman.displayLives()
+    def _draw_interface(self) -> None:
+        self._score_label['text'] = self.board.pacman.display_score()
+        self._level_label['text'] = self.board.pacman.display_level()
+        self._lives_label['text'] = self.board.pacman.display_lives()
 
     def _adjust_board(self):
         ''' Deletes the board and then redraws to prevent animation overlapping. '''
         self._canvas.delete(tk.ALL)
         self._draw_board()
-        self._drawInterface()
+        self._draw_interface()
 
     def _draw_pacman(self): # not used yet
         self._canvas.move(self._pacman, 1, 0)
 
-    # !!! MIGHT WANT TO MOVE THIS FUNCTION  !!! #
-    def _updateDirections(self):
-        if self.board.pacman.hasUpcomingDirection():
-            if self.board.validatePath( self.board.pacman.nextDirection ):
-                self.board.pacman.change_direction(self.board.pacman.nextDirection)
-                self.board.pacman.nextDirection = None
-                self.board.pacman.directionImage( self._images )
-        
-        if self.board.validatePath( self.board.pacman.direction ):
-            self.board.pacman.change_coords()
+    def game_over_GUI(self) -> None:
+        print('game over')
 
     # Level Completion / Transitioning Functions #
-    def _checkForCompletion(self):
+    def _check_for_completion(self):
         ''' Checks for completion of the level. If so, then displayCompleted is called
             to assist in the transition of the level change and loading screen. If not,
             then update the game as normal. '''
+        # Completed Level GUI #
         if self.board.level_complete():
-            self.displayCompleted()
+            self.display_completed()
             self._canvas.after(5000, self.run)
-            
+
+        # Stops Updating if Game is Over #
+        elif self.board._game_over:
+            self.board.pacman._image = None
+            self._adjust_board()
+            self.game_over_GUI()
+
+        # Game Progress #
         else:
             self._canvas.after(125, self.update)
         
-    def displayCompleted(self):
+    def display_completed(self):
         ''' This functions is to add a properly transition between the completed
             level and the loading screen. Mainly for visual purposes to appear nicer. '''
         self.board.pacman.direction = None
-        self._bindingsEnabled(False)
-        self._canvas.after(750, self.loadingScreen)
+        self._bindings_enabled(False)
+        self._canvas.after(750, self.loading_screen)
     
-    def loadingScreen(self):
+    def loading_screen(self):
         self._canvas.delete(tk.ALL)
         self._canvas.create_image( self._width / 2, self._height / 2,
                                    image = self._images.return_image('loading_screen') )
         
-        self._master.after(3500, self.levelAdvancement)
+        self._master.after(3500, self.level_advancement)
 
-    def levelAdvancement(self):
+    def level_advancement(self):
         ''' Board loads up a new level once the previous level is completed. '''
         self.board.new_level()
-        self._bindingsEnabled(True)
+        self._bindings_enabled(True)
 
-    def delayBeginning(self) -> None:
+    def delay_beginning(self) -> None:
         ''' Delays the game by a short amount of time with GUI to
             inform the player when the game is going to start. This is
             in order to prevent the game starting immediately and affecting
@@ -139,48 +139,50 @@ class Window():
         self._master.after(100, three)
         self._master.after(700, two)
         self._master.after(1300, one)
+
+    def check(self) -> None:
+        if self.board._game_over:
+            self._bindings_enabled(False)
+        
     
     # (Player) Binding Functions #
-    def pacmanDirection(self, event: tk.Event) -> None:
+    def pacman_direction(self, event: tk.Event) -> None:
         ''' Function that allows the player to move Pacman. Directions have
             to be validated in order to avoid stopped movement. nextDirection
             and lastDirection allow smoother control of Pacman. '''
         self.board.pacman.change_direction(event.keysym)
 
-        if self.board.validatePath( event.keysym ) == False:
-            self.board.pacman.nextDirection = event.keysym
-            self.board.pacman.direction = self.board.pacman.lastDirection
+        if self.board.validate_path( event.keysym ) == False:
+            self.board.pacman.next_direction = event.keysym
+            self.board.pacman.direction = self.board.pacman.last_direction
 
         else:
-            self.board.pacman.directionImage( self._images )
-            self.board.pacman.nextDirection = None
+            self.board.pacman.direction_image( self._images )
+            self.board.pacman.next_direction = None
 
-    def checkPause(self):
-        ''' CheckPause constantly calls itself to check when the player
+    def check_pause(self):
+        ''' Check_pause constantly calls itself to check when the player
             no longer wants the game to be paused. If so, then calls the
             update() function which will continue the game. '''
         if self._pause == True:
-            self._master.after(1, self.checkPause)
+            self._master.after(1, self.check_pause)
         else:
             self.update()
     
-    def _pauseGame(self, event: tk.Event):
+    def _pause_game(self, event: tk.Event):
         ''' Pauses the game by pressing escape. '''
-        if self._pause == True:
-            self._pause = False
-        else:
-            self._pause = True
+        self._pause = not self._pause
 
-    def _bindingsEnabled(self, enabled: bool) -> None:
+    def _bindings_enabled(self, enabled: bool) -> None:
         ''' The boolean argument is what decides if the bindings are enabled or
             disabled. The bindings are enabled during play, but disabled in betwene
             level transition, specifically during the loading screen. '''
         if enabled:
-            self._master.bind('<Left>', self.pacmanDirection)
-            self._master.bind('<Right>', self.pacmanDirection)
-            self._master.bind('<Up>', self.pacmanDirection)
-            self._master.bind('<Down>', self.pacmanDirection)
-            self._master.bind('<Escape>', self._pauseGame)
+            self._master.bind('<Left>', self.pacman_direction)
+            self._master.bind('<Right>', self.pacman_direction)
+            self._master.bind('<Up>', self.pacman_direction)
+            self._master.bind('<Down>', self.pacman_direction)
+            self._master.bind('<Escape>', self._pause_game)
 
         else:
             self._master.unbind('<Left>')
@@ -199,17 +201,17 @@ class Window():
 
         if not self._pause:
             self._adjust_board()
-            self._updateDirections()
-            self.board._updateObjects()
-            self._checkForCompletion()
+            self.board._update_directions()
+            self.board._update_objects()
+            self._check_for_completion()
 
         else:
             self._canvas.create_image(self._width / 2, self._height / 2,
                                       image = self._images.return_image('game_paused') )
-            self.checkPause()
+            self.check_pause()
 
     def run(self):
-        self.delayBeginning()
+        self.delay_beginning()
         self._master.after(2000, self.update) # put again here to allow mainloop() to still occur and also call gameloop
         self._master.mainloop()
 
