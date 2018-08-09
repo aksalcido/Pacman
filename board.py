@@ -69,11 +69,13 @@ class Board():
     
     def game_over(self):
         self._game_over = True
-        self.pacman  
+        self.pacman
+    
     # Game Update Functions #
     def _update_gamestate(self):
         x, y = self.pacman.return_location()
         self.validate_movement(x, y)
+        self.validate_enemy_movement()
 
         if not self._game_over:
             if self.validate_path( self.pacman.direction ):
@@ -112,13 +114,6 @@ class Board():
     
     def pacman_location(self) -> Pacman:
         ''' Returns the Pacman object on the board. '''
-        #for rows in self.Gamestate:
-            #for game_obj in rows:
-                #if type(game_obj) == Pacman:
-                    #return game_obj
-
-        # function above was O(N^2), changed to O(N):
-    
         for game_obj in self.game_objects:
             if type(game_obj) == Pacman:
                 return game_obj
@@ -154,6 +149,14 @@ class Board():
             self.pacman.contact( self.Gamestate[x][y] )
             self.game_progress(x, y)
 
+    def validate_enemy_movement(self):
+        enemies = { e for e in self.game_objects if type(e) == Enemy }
+
+        for e in enemies:
+            e.determineDirection(self, (e.x, e.y))
+            e.movement()
+            self[e.y][e.x] = e
+    
     # Individual Game Object Size Settings #
     def square_height(self) -> float:
         ''' Returns the height of each individual square in the level. '''
@@ -161,9 +164,9 @@ class Board():
 
     def square_width(self) -> float:
         '' 'Returns the width of each individual square in the level. '''
-        return self._window_width / self._board_width()
+        return self._window_width / self.board_width()
 
-    def _board_width(self) -> int:
+    def board_width(self) -> int:
         ''' Returns the width of the board, [0] as an index since all list inside are same length. '''
         return len(self.Gamestate[0])
 
@@ -233,7 +236,7 @@ class Board():
           [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, None, 0, 0, None, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
           [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, None, 0, 0, None, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
           [0, 0, 0, 0, 0, 0, 1, 0, 0, None, None, None, None, None, None, None, None, None, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, 0, 0, 0, 0, 0, 0, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, 0, None, 0, 0, None, 0, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
           [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, None, None, None, None, None, None, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
           [None, None, None, None, None, None, 1, 0, 0, None, 0, None, None, None, None, None, None, 0, None, 0, 0, 1, None, None, None, None, None, None],
           [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, None, 5, 6, 7, 8, None, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
