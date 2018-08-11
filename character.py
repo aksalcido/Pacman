@@ -19,7 +19,8 @@ class Character():
             
         elif self.direction == 'Left':
             self.x -= self.speed
-
+        
+        
     def change_speed(self):
         pass
 

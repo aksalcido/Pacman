@@ -8,12 +8,14 @@ class Board():
 
     def __init__(self, width, height, images):
         self._window_width = width
+
         self._window_height = height
 
         self.Gamestate = None
-        self.game_objects = set()
         self.images = images
+        self.game_objects = set()
         self.pacman = None
+        self.enemies = set()
         self._game_over = False
 
     # Level Functions #
@@ -25,9 +27,10 @@ class Board():
         score, lives, level = self.current_stats()
         self.Gamestate = Board.create_board()
         self.Gamestate = self._pacman_board( self.square_height(), self.square_width() )
-        self._update_objects()
+        self.update_board()
         self.pacman = self.pacman_location()
         self.pacman.level_up(score, lives, level)
+        self.enemies = { e for e in self.game_objects if type(e) == Enemy }
 
     def level_complete(self) -> bool:
         ''' Returns true or false if the total pickups on the board is 0.
@@ -37,7 +40,7 @@ class Board():
         return len(total_pickups) == 0
 
     def current_stats(self) -> tuple:
-        if self.Gamestate is not None:
+        if self.Gamestate is not None: # Game has started and level transitioning #
             score = self.pacman.score
             lives = self.pacman.lives
             level = self.pacman.level + 1
@@ -48,58 +51,61 @@ class Board():
 
         return score, lives, level
 
-    def game_progress(self,x, y):
+    def check_for_gameover(self):
         ''' This function mainly checks for the progress of Pacman. If Pacman
             dies and is out of lives, then the game is over. Otherwise, respawns
             from the original spot. If Pacman is still alive, then the board is
             just updated with his new position. '''
+        self.pacman.lose_life()
 
-        if self.pacman.death:
-            self.pacman.lose_life()
-
-            if not self.pacman.out_of_lives():
-                self.pacman.respawn( self.images )
-                self.Gamestate[self.pacman.y][self.pacman.x] = self.pacman
-
-            else:
-                self.game_over()
+        if not self.pacman.out_of_lives():
+            self.pacman.is_respawning = True
+            self.pacman.respawn( self.images )
+            self.Gamestate[self.pacman.y][self.pacman.x] = self.pacman
 
         else:
-            self.Gamestate[x][y] = self.pacman
-    
+            self.game_over()
+
     def game_over(self):
         self._game_over = True
-        self.pacman
     
     # Game Update Functions #
-    def _update_gamestate(self):
-        x, y = self.pacman.return_location()
-        self.validate_movement(x, y)
-        self.validate_enemy_movement()
-
-        if not self._game_over:
-            if self.validate_path( self.pacman.direction ):
-                if self.pacman.direction == 'Left':
-                    self.Gamestate[x][y+1] = None
-
-                elif self.pacman.direction == 'Right':
-                    self.Gamestate[x][y-1] = None
-
-                elif self.pacman.direction == 'Down':
-                    self.Gamestate[x-1][y] = None
-
-                elif self.pacman.direction == 'Up':
-                    self.Gamestate[x+1][y] = None
-
-        else:
-            self.Gamestate[x][y] = None
-            
-    def _update_objects(self):
+    def update_board(self):
         ''' Updates the game_objects set to the objects that are inside the current Gamestate.
             Also updates where the current location of Pacman is on the board. '''
         self.game_objects = { objs for rows in self.Gamestate for objs in rows if objs is not None }
         self.pacman = self.pacman_location()
-        self._update_gamestate()
+        self.update_gamestate()
+    
+    def update_gamestate(self):
+        y, x = self.pacman.return_location()
+        self.validate_movement(y, x)
+        self.validate_enemy_movement(y, x)
+    
+        if not self._game_over:
+            self._update_board_square(y, x)
+        else:
+            self.Gamestate[y][x] = None
+
+
+    def _update_board_square(self, y, x):
+        ''' Updates the last spot that Pacman was in and makes it None, this is specifically
+            aimed to assist at updating the board while removing the Pickups when Pacman
+            goes over them. Then, the Gamestate is updating with Pacman's new location. '''
+        if self.validate_path( self.pacman.direction ):
+            if self.pacman.direction == 'Left':
+                self.Gamestate[y][x+1] = None
+
+            elif self.pacman.direction == 'Right':
+                self.Gamestate[y][x-1] = None
+
+            elif self.pacman.direction == 'Down':
+                self.Gamestate[y-1][x] = None
+
+            elif self.pacman.direction == 'Up':
+                self.Gamestate[y+1][x] = None
+
+            self.Gamestate[y][x] = self.pacman
 
     def _update_directions(self):
         if self.pacman.has_upcoming_direction():
@@ -120,6 +126,9 @@ class Board():
 
     # Direction Validation Functions #
     def validate_path(self, direction) -> bool:
+        ''' Ensures that the direction Pacman is attempting to go is not a
+            Wall object. If there is no wall in the next spot, returns True,
+            else returns False. '''
         pacman = self.pacman_location()
         
         if direction == 'Left':
@@ -134,28 +143,34 @@ class Board():
         elif direction == 'Up':
             return type(self.Gamestate[pacman.y - 1][pacman.x]) != Wall
 
-    def validate_movement(self, x, y):
+    def validate_movement(self, y, x):
         '''
         Checks for the case that Pacman crosses to the other side via one side,
         which are when x == 14 and y == 0 or 27. If this is the case, the pacman
         object changes it's x and y with the crossed_boundary method. Otherwise the
         Gamestate is updated regularly.
         '''
-        if (x == 14 and y == 0) or (x == 14 and y == 27):
+    
+        if (y == 14 and x == 0) or (y == 14 and x == 27):
             self.pacman.crossed_boundary()
             self.Gamestate[self.pacman.y][self.pacman.x] = self.pacman
 
         else:
-            self.pacman.contact( self.Gamestate[x][y] )
-            self.game_progress(x, y)
+            self.pacman.contact( self.Gamestate[y][x] )
 
-    def validate_enemy_movement(self):
-        enemies = { e for e in self.game_objects if type(e) == Enemy }
+    def validate_enemy_movement(self, pacman_y, pacman_x):
+        for enemy in self.enemies:
+            enemy.determineDirection(self, (enemy.x, enemy.y), pacman_y, pacman_x)
+            self._validate_enemy_position(enemy, pacman_y, pacman_x)
 
-        for e in enemies:
-            e.determineDirection(self, (e.x, e.y))
-            e.movement()
-            self[e.y][e.x] = e
+    def _validate_enemy_position(self, enemy, pacman_y, pacman_x):
+        ''' Checks if the position of the enemy is the same position as Pacman, if so then
+            calls the function check_for_gameover(). Else it's just going to update the
+            board with the enemy. '''
+        if (e.y, e.x) == (pacman_y, pacman_x):
+            self.check_for_gameover()
+        else:
+            self.Gamestate[e.y][e.x] = enemy
     
     # Individual Game Object Size Settings #
     def square_height(self) -> float:
@@ -239,7 +254,7 @@ class Board():
           [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, 0, None, 0, 0, None, 0, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
           [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, None, None, None, None, None, None, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
           [None, None, None, None, None, None, 1, 0, 0, None, 0, None, None, None, None, None, None, 0, None, 0, 0, 1, None, None, None, None, None, None],
-          [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, None, 5, 6, 7, 8, None, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, None, 5, 0, 0, 0, None, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0], #          [0, 0, 0, 0, 0, 0, 1, 0, 0, None, 0, None, 5, 6, 7, 8, None, 0, None, 0, 0, 1, 0, 0, 0, 0, 0, 0],
           [None, None, None, None, None, 0, 1, 0, 0, None, 0, 0, 0, 0, 0, 0, 0, 0, None, 0, 0, 1, 0, None, None, None, None],
           [None, None, None, None, None, 0, 1, 0, 0, None, None, None, None, None, None, None, None, None, None, 0, 0, 1, 0, None, None, None, None, None],
           [None, None, None, None, None, 0, 1, 0, 0, None, 0, 0, 0, 0, 0, 0, 0, 0, None, 0, 0, 1, 0, None, None, None, None, None],
@@ -252,7 +267,7 @@ class Board():
           [0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0],
           [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
           [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-          [0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+          [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
           [0] + [1 for i in range(26)] + [0],
           [0 for i in range(28)]]
         
