@@ -1,4 +1,4 @@
-1. Pacman can avoid an enemy by switching direction constantly so they do not contain the same space.
+1. If Pacman is going right, stops without making a direction change, and then gets caught from behind, game breaks.
 2. Respawn transitioning isn't properly implemented.
 3. Enemies need to be sent back to their spawn when Pacman loses a life.
 4. Every now and then, if Pacman dies in a certain position, leads to becoming a Nonetype calling a function.

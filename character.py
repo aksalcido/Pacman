@@ -6,7 +6,8 @@ class Character():
         self.speed = speed
         self.direction = direction
         self._image = None
-
+        self.starting_point = x, y
+    
     def movement(self):
         if self.direction == 'Up':
             self.y -= self.speed
@@ -20,7 +21,9 @@ class Character():
         elif self.direction == 'Left':
             self.x -= self.speed
         
-        
+    def initial_position(self):
+        self.x, self.y = self.starting_point
+    
     def change_speed(self):
         pass
 

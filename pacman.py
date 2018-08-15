@@ -9,17 +9,17 @@ class Pacman(Character):
         Character.__init__(self, x, y, speed, direction)
         self.score, self.lives, self.level = 0, 3, 1
         self.last_direction, self.next_direction = 'Left', None
-        self.invulnerable, self.death = False, False
+        self.invulnerable, self.is_respawning = False, False
         self.direction_image(images)
-        self._startingPoint = (x, y)
 
         # https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
 
     def restart_level(self):
         ''' On death, original values are restored. '''
-        self.x, self.y = self._startingPoint
+        self.initial_position()
         self.change_direction('Left')
         self.next_direction = None
+        self.is_respawning = True
     
     # Game Progression Functions #
     def contact(self, gameObj):
@@ -51,13 +51,13 @@ class Pacman(Character):
 
     def lose_life(self):
         self.lives -= 1
-    
+
     def invulnerability(self):
         self.invulnerable = not self.invulnerable
         
     def out_of_lives(self):
         return self.lives == 0
-
+    
     # Direction Functions #
     def change_direction(self, direction):
         self.last_direction = self.direction

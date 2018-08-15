@@ -88,26 +88,50 @@ class Window():
         elif self.board._game_over:
             self._gameover_transition()
 
+        elif self.board.pacman.is_respawning:
+            self.board.pacman.is_respawning = False
+            self._respawn_transition()
+            
         # Game Progress #
         else:
             self._canvas.after(125, self.update)
-
-    def _check_for_respawning(self) -> None:
-        if self.board.pacman.is_respawning:
-            self._respawn_transition()
     
     def display_completed(self) -> None:
         ''' This functions is to add a proper transition between the completed
             level and the loading screen. Mainly for visual purposes to appear nicer. '''
         self.board.pacman.direction = None
-        self._bindings_enabled(False)
+        self._bindings_enabled(False)       # bindings are disabled during loading screen
         self._canvas.after(750, self.loading_screen)
-    
+
+    def loading_screen(self) -> None:
+        self._canvas.delete(tk.ALL)
+        self._canvas.create_image( self._width / 2, self._height / 2,
+                                   image = self._images.return_image('loading_screen') )
+        
+        self._master.after(3500, self.level_advancement)
+
     def level_advancement(self) -> None:
         ''' Board loads up a new level once the previous level is completed. '''
         self.board.new_level()
         self._bindings_enabled(True)
 
+    def gameover_screen(self) -> None:
+        ''' Creates an image to display to the User when it is Game Over. '''
+        self._canvas.create_image( self._width / 2, self._height / 2,
+                                   image = self._images.return_image('over') )
+
+    def _gameover_transition(self) -> None:
+        self._bindings_enabled(False)       # bindings are disabled when game is over
+        self.board.pacman._image = None     # pacman is no longer on the board, so no image required
+        self._adjust_board()
+        self.gameover_screen()
+
+    def _respawn_transition(self) -> None:
+        self.delay_beginning()
+        #self.board.pacman.is_respawning = False
+        
+        self._master.after(2100, self.update)
+        
     def delay_beginning(self) -> None:
         ''' Delays the game by a short amount of time with GUI to
             inform the player when the game is going to start. This is
@@ -131,29 +155,7 @@ class Window():
         self._master.after(100, three)
         self._master.after(700, two)
         self._master.after(1300, one)
-
-    def loading_screen(self) -> None:
-        self._canvas.delete(tk.ALL)
-        self._canvas.create_image( self._width / 2, self._height / 2,
-                                   image = self._images.return_image('loading_screen') )
         
-        self._master.after(3500, self.level_advancement)
-
-    def gameover_screen(self) -> None:
-        self._canvas.create_image( self._width / 2, self._height / 2,
-                                   image = self._images.return_image('over') )
-
-    def _gameover_transition(self) -> None:
-        self._bindings_enabled(False)
-        self.board.pacman._image = None
-        self._adjust_board()
-        self.gameover_screen()
-
-    def _respawn_transition(self) -> None:
-        self.delay_beginning()
-        self.board.pacman.respawn = False
-        self.after(2000, self.update)
-    
     # (Player) Binding Functions #
     def pacmans_direction(self, event: tk.Event) -> None:
         ''' Function that allows the player to move Pacman. Directions have
@@ -217,8 +219,6 @@ class Window():
             self.board._update_directions()
             self.board.update_board()
             self._check_for_completion()
-            self._check_for_respawning()
-
             
         else:
             self._canvas.create_image(self._width / 2, self._height / 2,

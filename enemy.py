@@ -14,7 +14,7 @@ class Enemy(Character):
         self.enemy_type = enemy_type
         self.determine_image(enemy_type, images)
 
-
+        
     def determine_image(self, enemy_type, images):
         if enemy_type == Enemy.inky:
             self._image = images.return_image('inky')
