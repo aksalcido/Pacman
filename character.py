@@ -7,6 +7,8 @@ class Character():
         self.direction = direction
         self._image = None
         self.starting_point = x, y
+        self.last_location = None
+        self.invulnerable = False
     
     def movement(self):
         if self.direction == 'Up':
@@ -20,7 +22,10 @@ class Character():
             
         elif self.direction == 'Left':
             self.x -= self.speed
-        
+
+    def invulnerability(self):
+        self.invulnerable = not self.invulnerable
+
     def initial_position(self):
         self.x, self.y = self.starting_point
     

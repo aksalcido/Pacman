@@ -9,9 +9,10 @@ class Pacman(Character):
         Character.__init__(self, x, y, speed, direction)
         self.score, self.lives, self.level = 0, 3, 1
         self.last_direction, self.next_direction = 'Left', None
-        self.invulnerable, self.is_respawning = False, False
+        self.is_respawning = False
         self.direction_image(images)
 
+        self.invulnerable_spaces = 50
         # https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
 
     def restart_level(self):
@@ -30,10 +31,12 @@ class Pacman(Character):
         if type(gameObj) == Pickup:
             if gameObj.boost:
                 self.score += 50
-                self.invulnerability()
+                self.boost_picked_up()
+        
             else:
                 self.score += 10
-            
+
+        # bottom half is never happening anymore #
         elif type(gameObj) == Enemy:
             if self.invulnerable:
                 self.score += 100
@@ -51,13 +54,27 @@ class Pacman(Character):
 
     def lose_life(self):
         self.lives -= 1
-
-    def invulnerability(self):
-        self.invulnerable = not self.invulnerable
         
     def out_of_lives(self):
         return self.lives == 0
+
+    def boost_picked_up(self):
+        ''' This function checks if Pacman is invulnerable when he picks up
+            a boost. If he is then the counter is refreshed and he remains
+            invulnerable for a longer time. Otherwise, he becomes invulnerable
+            if he wasn't previously. '''
+        if not self.invulnerable:
+            self.invulnerability()
+        else:
+            self.invulnerable_spaces = 49
     
+    def boost_running_out(self):
+        self.invulnerable_spaces -= 1
+    
+    def normal_state(self):
+        self.invulnerable_spaces = 50
+        self.invulnerability()
+        
     # Direction Functions #
     def change_direction(self, direction):
         self.last_direction = self.direction
