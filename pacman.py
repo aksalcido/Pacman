@@ -4,6 +4,7 @@ from pickup import Pickup
 
 class Pacman(Character):
     pacman = 9
+    ticks = 50
     
     def __init__(self, x, y, images, speed = 1, direction = 'Left'):
         Character.__init__(self, x, y, speed, direction)
@@ -12,7 +13,7 @@ class Pacman(Character):
         self.is_respawning = False
         self.direction_image(images)
 
-        self.invulnerable_spaces = 50
+        self.invulnerable_ticks = Pacman.ticks
         # https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
 
     def restart_level(self):
@@ -66,13 +67,13 @@ class Pacman(Character):
         if not self.invulnerable:
             self.invulnerability()
         else:
-            self.invulnerable_spaces = 49
+            self.invulnerable_ticks = Pacman.ticks - 1
     
     def boost_running_out(self):
-        self.invulnerable_spaces -= 1
+        self.invulnerable_ticks -= 1
     
     def normal_state(self):
-        self.invulnerable_spaces = 50
+        self.invulnerable_ticks = Pacman.ticks
         self.invulnerability()
         
     # Direction Functions #

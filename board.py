@@ -51,7 +51,7 @@ class Board():
 
         return score, lives, level
 
-    def game_continuation(self, y, x) -> None:
+    def game_continuation(self, y, x, previous_y, previous_x) -> None:
         ''' Checks if Pacman is ongoing to an enemy, if so restarts the level due to death.
             Otherwise, checks if the game is not over, and if so updates the board square.
             Otherwise, Pacman's location become's None because the game is done. '''
@@ -61,7 +61,7 @@ class Board():
 
         else:
             if not self._game_over:
-                self._update_board_square(y, x)
+                self._update_board_square(y, x, previous_y, previous_x)
             else:
                 self.Gamestate[y][x] = None
     
@@ -100,31 +100,26 @@ class Board():
         self.update_gamestate()
 
     def update_gamestate(self):
-        previous_y, previous_x = self.pacman.return_location()
-        self.validate_movement(previous_y, previous_x)          # movement occurs in this function
+        ''' Updates the entire gamestate each time it is called. This function is in charge of
+            all the character object's movement, and game states as the game progresses. '''
+        previous_y, previous_x = self.pacman.return_location()      # pacman's previous updated location is stored to validate the next player movement
+        self.validate_movement(previous_y, previous_x)              # pacman's movement is validated from current spot, and then pacman has a new location
         
-        new_y, new_x = self.pacman.return_location()            # pacman now has a new location
-        self.validate_pacman_state()                            # validates is pacman is invulnerable or not
+        new_y, new_x = self.pacman.return_location()                # pacman's new updated location is stored
+        self.validate_pacman_state()                                # validates if pacman picks up a boost
         
-        self.validate_enemy_movement(new_y, new_x)              # enemies need to determine direction -> pacman's new location
-        self.game_continuation(new_y, new_x)
+        self.validate_enemy_movement(new_y, new_x)                  # enemies need to determine direction -> pacman's new location
+        self.game_continuation(new_y, new_x, previous_y, previous_x)# checks for death, game over, and updates Pacman's previous board square
 
 
-    def _update_board_square(self, y, x):
+    def _update_board_square(self, y, x, previous_y, previous_x):
         ''' Updates the last spot that Pacman was in and makes it None, this is specifically
             aimed to assist at updating the board while removing the Pickups when Pacman
             goes over them. Then, the Gamestate is updating with Pacman's new location. '''
-        try:
-            if self.validate_path( self.pacman.direction ):
-                if self.pacman.last_location is not None:
-                    previous_y, previous_x = self.pacman.last_location
-                    self.Gamestate[previous_y][previous_x] = None
+        if self.validate_path( self.pacman.direction ):
+            self.Gamestate[previous_y][previous_x] = None
 
-            self.Gamestate[y][x] = self.pacman
-            
-        except IndexError:
-            pass
-
+        self.Gamestate[y][x] = self.pacman
 
     def _update_directions(self):
         ''' This function is what allows smoother movement when wanting to change Pacman's
@@ -151,7 +146,7 @@ class Board():
 
     def update_enemy_respawns(self):
         ''' Updates all of the enemy positions on the board back to their original spot
-            when Pacman loses a life. '''
+            when level needs to be restarted. '''
         for enemy in self.enemies:
             enemy.initial_position()
             self.Gamestate[enemy.y][enemy.x] = enemy
@@ -162,6 +157,7 @@ class Board():
             again to flip back to normal. '''
         for enemy in self.enemies:
             enemy.invulnerability()
+            enemy.determine_image(enemy.enemy_type, self.images)
         
     def pacman_location(self) -> Pacman:
         ''' Returns the Pacman object on the board. '''
@@ -195,11 +191,11 @@ class Board():
             each update. '''
         if self.pacman.invulnerable:
 
-            if self.pacman.invulnerable_spaces == 50:   # 50 indicates Pacman barley became invulnerable
+            if self.pacman.invulnerable_ticks == Pacman.ticks:   # Pacman.ticks (50) indicates Pacman barley became invulnerable
                 self.update_enemy_states()
                 self.pacman.boost_running_out()
 
-            elif self.pacman.invulnerable_spaces == 0:  # Pacman runs out of his invulnerability so states are returned to normal
+            elif self.pacman.invulnerable_ticks == 0:  # Pacman runs out of his invulnerability so states are returned to normal
                 self.update_enemy_states()
                 self.pacman.normal_state()
             
