@@ -6,8 +6,8 @@ class Pacman(Character):
     pacman = 9
     ticks = 50
     
-    def __init__(self, x, y, images, speed = 1, direction = 'Left'):
-        Character.__init__(self, x, y, speed, direction)
+    def __init__(self, x, y, images, direction = 'Left'):
+        Character.__init__(self, x, y, direction)
         self.score, self.lives, self.level = 0, 3, 1
         self.last_direction, self.next_direction = 'Left', None
         self.is_respawning = False

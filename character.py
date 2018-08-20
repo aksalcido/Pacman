@@ -1,9 +1,9 @@
 class Character():
 
-    def __init__(self, x, y, speed, direction):
+    def __init__(self, x, y, direction):
         self.x = x
         self.y = y
-        self.speed = speed
+        self.speed = 1
         self.direction = direction
         self._image = None
         self.starting_point = x, y
