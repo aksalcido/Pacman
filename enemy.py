@@ -16,6 +16,10 @@ class Enemy(Character):
         self.invulnerable = True
         self.determine_image(enemy_type, images)
         self.pickup_memory = None
+
+    def discard_pickup(self):
+        self.on_pickup = False
+        self.pickup_memory = None
         
     def determine_image(self, enemy_type, images):
         if self.invulnerable:

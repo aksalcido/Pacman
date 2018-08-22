@@ -73,6 +73,7 @@ class Board():
         self.pacman.lose_life() # Pacman loses a life on death
 
         if not self.pacman.out_of_lives():
+            self.restore_gamestate()
             self.update_respawn_board()
         else:
             self.game_over()
@@ -88,8 +89,7 @@ class Board():
         if enemy.pickup_memory is not None:
             y, x = enemy.last_location
             self.Gamestate[y][x] = enemy.pickup_memory
-            enemy.on_pickup = False
-            enemy.pickup_memory = None
+            enemy.discard_pickup()
     
     # Game Update Functions #
     def update_board(self):
@@ -111,6 +111,7 @@ class Board():
         self.validate_enemy_movement(new_y, new_x)                  # enemies need to determine direction -> pacman's new location
         self.game_continuation(new_y, new_x, previous_y, previous_x)# checks for death, game over, and updates Pacman's previous board square
 
+        
 
     def _update_board_square(self, y, x, previous_y, previous_x):
         ''' Updates the last spot that Pacman was in and makes it None, this is specifically
@@ -139,9 +140,9 @@ class Board():
     def update_respawn_board(self):
         ''' When pacman is respawning, Pacman and all the enemies are put in their
             original starting position. '''
+        self.update_enemy_respawns()      
         self.pacman.respawn( self.images )
         self.Gamestate[self.pacman.y][self.pacman.x] = self.pacman
-        self.update_enemy_respawns()
 
 
     def update_enemy_respawns(self):
@@ -249,6 +250,7 @@ class Board():
             board with the enemy. '''
         
         if (enemy.y, enemy.x) == (pacman_y, pacman_x):
+            #print(enemy.y, enemy.x, pacman_y, pacman_x, self.pacman.y, self.pacman.x)
             self.check_for_gameover()
         else:
             self.restore_pickup(enemy)
@@ -295,6 +297,36 @@ class Board():
             yield row
 
     # Board Creation Functions #
+    def restore_gamestate(self):
+        ''' This function is used when Pacman dies to restore a normal gamestate. Since
+            positions become all over the place for the characters, this will append None
+            for the character positions, because their positions are dealt with in seperate
+            functions. The gamestate is then equaled to this normalized gamestate. '''
+        saved_gamestate = []
+
+        for i in range(len(self)):
+            new_row = []
+            for j in range(len(self[i])):
+                
+                if type(self.Gamestate[i][j]) == Pacman:
+                    new_row.append(None)
+
+                elif type(self.Gamestate[i][j]) == Enemy:
+
+                    if self.Gamestate[i][j].pickup_memory is not None:
+                        new_row.append(self.Gamestate[i][j].pickup_memory)
+                        self.Gamestate[i][j].discard_pickup()
+                    
+                    else:
+                        new_row.append(None)
+                
+                else:
+                    new_row.append(self.Gamestate[i][j])
+
+            saved_gamestate.append(new_row)
+
+        self.Gamestate = saved_gamestate
+
     def _pacman_board(self, height, width) -> [list]:
         ''' Takes the board of numbers, and easily sets up the coordinates of each object,
             as manually typing each object with their coordinates would take way too long. '''
@@ -368,3 +400,4 @@ class Board():
         
         
         return new_board
+
