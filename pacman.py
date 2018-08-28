@@ -5,10 +5,17 @@ from pickup import Pickup
 class Pacman(Character):
     pacman = 9
     ticks = 50
+    no_score = 0
+    level_one = 1
+    three_lives = 3
     
     def __init__(self, x, y, images, direction = 'Left'):
         Character.__init__(self, x, y, direction)
-        self.score, self.lives, self.level = 0, 3, 1
+        self.score = Pacman.no_score
+        self.life_score = Pacman.no_score
+        self.lives = Pacman.three_lives
+        self.level = Pacman.level_one
+
         self.last_direction, self.next_direction = 'Left', None
         self.is_respawning = False
         self.direction_image(images)
@@ -44,6 +51,12 @@ class Pacman(Character):
 
             else:
                 self.death = True
+
+        self.one_up()
+
+    def one_up(self):
+        pass
+
     
     def level_up(self, score, lives, level) -> None:
         self.score, self.lives, self.level = score, lives, level

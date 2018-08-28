@@ -85,7 +85,7 @@ class Window():
             self._canvas.after(5000, self.run)
 
         # Gameover -> Stops Updating / Transitions to Gameover Screen #
-        elif self.board._game_over:
+        elif self.board.game_over:
             self._gameover_transition()
 
         elif self.board.pacman.is_respawning:
@@ -216,7 +216,7 @@ class Window():
 
         if not self._pause:
             self._adjust_board()
-            self.board._update_directions()
+            self.board.update_directions()
             self.board.update_board()
             self._check_for_completion()
             

@@ -17,6 +17,11 @@ class Enemy(Character):
         self.determine_image(enemy_type, images)
         self.pickup_memory = None
 
+        if enemy_type == Enemy.inky:
+            self.movement_turns = 10
+            self.last_choice = None
+
+        
     def discard_pickup(self):
         self.on_pickup = False
         self.pickup_memory = None
@@ -74,9 +79,10 @@ class Enemy(Character):
         ''' Inky's movement differentiates between the other three ghost. So we use
             random() from the random library to determine which movement he will follow,
             and it will constantly be changing as time goes on. '''
-        choice = random()
+        choice = self.inkys_choice()
+        self._inky_movement_turns()
 
-        if choice <= .25:
+        if choice <= .33:
             return self.blinky_movement(board, start, endpoint_y, endpoint_x)
 
         elif choice <= .75:
@@ -85,8 +91,26 @@ class Enemy(Character):
         elif choice <= 1:
             return self.pinky_movement(board, start, endpoint_y, endpoint_x)
 
+    def inkys_choice(self):
+        ''' Inky has unstable movement, but the movement choices occur every 10 updates.
+            So the last choice is saved to keep it going for 10 updates in a row. '''
+        if self.movement_turns == 10:
+            self.last_choice = random()
 
+        return self.last_choice
     
+    def _inky_movement_turns(self):
+        self._decrement_movement_turns()
+
+        if self.movement_turns == 0:
+            self.movement_turns = 10
+            self.last_choice = None
+ 
+    def _decrement_movement_turns(self):
+        ''' Decrements the attribute movement_turns by 1 until it reaches 0,
+            but will never stay at 0, or be less than 0. '''
+        self.movement_turns -= 1
+        
     # Pinky Movement Functions #
     def pinky_movement(self, board, start, pacman_y, pacman_x):
         ''' Pinky's movement is meant to ambush, so we have pacman's location
@@ -101,6 +125,7 @@ class Enemy(Character):
 
     def pinky_endpoints(self):
         pass
+
     
     # Clyde Movement Functions #
     def clyde_movement(self, board, start):
