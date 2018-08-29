@@ -17,8 +17,8 @@ class Enemy(Character):
         self.determine_image(enemy_type, images)
         self.pickup_memory = None
 
-        if enemy_type == Enemy.inky:
-            self.movement_turns = 10
+        if enemy_type == Enemy.inky or enemy_type == Enemy.clyde:
+            self.movement_turns = 15
             self.last_choice = None
 
         
@@ -66,7 +66,7 @@ class Enemy(Character):
             self.pinky_movement(board, start, pacman_y, pacman_x)
 
         elif self.enemy_type == Enemy.clyde:
-            self.clyde_movement(board, start)
+            self.clyde_movement(board)
 
     # Inky Movement Functions #
     def blinky_movement(self, board, start, pacman_y, pacman_x):
@@ -79,37 +79,18 @@ class Enemy(Character):
         ''' Inky's movement differentiates between the other three ghost. So we use
             random() from the random library to determine which movement he will follow,
             and it will constantly be changing as time goes on. '''
-        choice = self.inkys_choice()
-        self._inky_movement_turns()
+        choice = self.random_choice()
+        self._inky_and_clyde_movement_turns()
 
         if choice <= .33:
             return self.blinky_movement(board, start, endpoint_y, endpoint_x)
 
         elif choice <= .75:
-            return self.clyde_movement(board, start)
+            return self.clyde_movement(board)
 
         elif choice <= 1:
             return self.pinky_movement(board, start, endpoint_y, endpoint_x)
 
-    def inkys_choice(self):
-        ''' Inky has unstable movement, but the movement choices occur every 10 updates.
-            So the last choice is saved to keep it going for 10 updates in a row. '''
-        if self.movement_turns == 10:
-            self.last_choice = random()
-
-        return self.last_choice
-    
-    def _inky_movement_turns(self):
-        self._decrement_movement_turns()
-
-        if self.movement_turns == 0:
-            self.movement_turns = 10
-            self.last_choice = None
- 
-    def _decrement_movement_turns(self):
-        ''' Decrements the attribute movement_turns by 1 until it reaches 0,
-            but will never stay at 0, or be less than 0. '''
-        self.movement_turns -= 1
         
     # Pinky Movement Functions #
     def pinky_movement(self, board, start, pacman_y, pacman_x):
@@ -128,17 +109,91 @@ class Enemy(Character):
 
     
     # Clyde Movement Functions #
-    def clyde_movement(self, board, start):
+    def clyde_movement(self, board):
         ''' Clyde's movement is random, and he does not chase or ambush. That
             is why it is not required for him to have any endpoint arguments. '''
         # --> endpoints done here
-        endpoint_y, endpoint_x = 2, 1
+        choice = self.random_choice()
+        self._inky_and_clyde_movement_turns()
+        self.random_direction(choice)
+        
+        if self.valid_direction(board):
+            self.enemy_moved()
 
-        # endpoints plugged below
-        path = self.determine_path(board, start, endpoint_y, endpoint_x)
+        else:
+            self.clydes_wrong_direction()
 
-        self.path_finding_direction(path)
+    def clydes_wrong_direction(self):
+        ''' If clyde has a wrong direction, then his movement_turns are automatically
+            set to 0 so that he can make a random choice on which direction to go.
+            Must specific if enemy is clyde, because Inky can have any three of the
+            other enemy's directions, and this is not the case for him. '''
+        if self.enemy_type == Enemy.clyde:
+            self.movement_turns = 0
+            self.last_choice = None
+        
     
+    def _inky_and_clyde_movement_turns(self):
+        ''' Inky and clyde are the only enemy with movement_turns attribute, because
+            their movement is based off a random choice that last for 15 updates. '''
+        self._decrement_movement_turns()
+
+        if self.movement_turns == 0:
+            self.movement_turns = 15
+            self.last_choice = None
+ 
+    def _decrement_movement_turns(self):
+        ''' Decrements the attribute movement_turns by 1 until it reaches 0,
+            but will never stay at 0, or be less than 0. '''
+        self.movement_turns -= 1
+
+    # Direction and Movement Functions #
+    def random_direction(self, choice):
+        ''' Splits the chances into 1/4 for each direction, and is randomly chosen. '''
+        if choice <= .25:
+            self.direction = 'Left'
+
+        elif choice <= .50:
+            self.direction = 'Right'
+
+        elif choice <= .75:
+            self.direction = 'Down'
+
+        elif choice <= 1:
+            self.direction = 'Up'
+        
+    def valid_direction(self, board) -> bool:
+        ''' Validates if the direction on the board will bump them into a wall.
+            If it is not a wall, it returns true and is a valid direction, otherwise
+            returns false. '''
+        y, x = self.return_location()
+        
+        if self.direction == 'Left':
+            return type(board[y][x - 1]) != Wall
+
+        elif self.direction == 'Right': 
+            return type(board[y][x + 1]) != Wall
+
+        elif self.direction == 'Down':
+            return type(board[y + 1][x]) != Wall
+
+        elif self.direction == 'Up':
+            return type(board[y - 1][x]) != Wall
+
+    def random_choice(self):
+        ''' Inky and clyde have unstable movement, but the movement choices occur every 15 updates.
+            So the last choice is saved to keep it going for 15 updates in a row. '''
+        if self.movement_turns == 15 or self.last_choice == None:
+            self.last_choice = random()
+
+        return self.last_choice
+    
+    def enemy_moved(self):
+        ''' Once an enemy has moved, their current location is saved, and
+            then movement is called that places them in a new location. '''
+        self.last_location = self.return_location()
+        self.movement()
+
     # Pathfinding Functions #
     def path_finding_direction(self, path):
         ''' This function is what changes the direction depending on the next location
@@ -160,8 +215,7 @@ class Enemy(Character):
             elif self.x > path[distance][0]:
                 self.direction = 'Left'
 
-            self.last_location = self.return_location()
-            self.movement()
+            self.enemy_moved()
     
     def breadth_first_search(self, board, start, endpoint_y, endpoint_x):
         ''' The bfs algorithm is required in order to transverse through the
@@ -180,10 +234,18 @@ class Enemy(Character):
                 return path
 
             for x2, y2 in ((x+1, y), (x-1, y), (x, y+1), (x, y-1)):
-                if 0 <= x2 < board.board_width() and 0 <= y2 < len(board) and \
-                   type(gamestate[y2][x2]) != Wall and (x2, y2) not in seen:
+                if self.wanted_path_indexes(board, gamestate, seen, x2, y2):
                     queue.append(path + [(x2, y2)])
                     seen.add((x2, y2))
+
+    def wanted_path_indexes(self, board, gamestate, seen, x, y):
+        ''' To be a wanted index, x and y have to be within the board boundaries.
+            The position of y, x on the board also can not be a wall, since we need
+            a valid path. And (x, y) can not be duplicated, so must not be in the set seen. '''
+        return 0 <= x < board.board_width() and \
+               0 <= y < len(board) and \
+               type(gamestate[y][x]) != Wall and \
+               (x, y) not in seen
 
     def _path_length(self, path) -> int:
         ''' This function is a helper function to avoid index errors depending on
