@@ -27,8 +27,8 @@ class Character():
         self.invulnerable = not self.invulnerable
 
     def initial_position(self):
-        self.x, self.y = self.starting_point
-    
+        self.change_location(self.starting_point[0], self.starting_point[1])
+        
     def change_speed(self):
         pass
 
@@ -36,6 +36,7 @@ class Character():
         self.direction = direction
         
     def change_location(self, x, y):
+        ''' Changes the location of the character's x and y values to the x and y arguments. '''
         self.x, self.y = x, y
 
     def return_location(self):

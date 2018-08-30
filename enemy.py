@@ -14,19 +14,24 @@ class Enemy(Character):
         Character.__init__(self, x, y, direction)
         self.enemy_type = enemy_type
         self.invulnerable = True
+        self.slowed_down = False
         self.determine_image(enemy_type, images)
         self.pickup_memory = None
 
-        if enemy_type == Enemy.inky or enemy_type == Enemy.clyde:
+        if enemy_type == Enemy.inky or enemy_type == Enemy.clyde: # Only Inky and Clyde require these Attributes
             self.movement_turns = 15
             self.last_choice = None
 
         
     def discard_pickup(self):
+        ''' This function is called when an enemy was holding a pickup and then discards
+            it, and is used as memory. '''
         self.on_pickup = False
         self.pickup_memory = None
         
     def determine_image(self, enemy_type, images):
+        ''' Image display to player is determined by which type of enemy it is. If the enemy
+            is not invulnerable, then they all have the same common vulnerable ghost image. '''
         if self.invulnerable:
             if enemy_type == Enemy.inky:
                 self._image = images.return_image('inky')
@@ -53,29 +58,31 @@ class Enemy(Character):
             return self.breadth_first_search(board, start, self.starting_point[1], self.starting_point[0])[:-1]
 
 
-    def determineDirection(self, board, start, pacman_y, pacman_x):
+    def determineDirection(self, board, pacman):
         ''' Direction is determined by the enemy type. Since each enemy type
             has their own unique game movement. '''
+        start = self.x, self.y
+        
         if self.enemy_type == Enemy.blinky:
-            self.blinky_movement(board, start, pacman_y, pacman_x)
+            self.blinky_movement(board, start, pacman)
 
         elif self.enemy_type == Enemy.inky:
-            self.inky_movement(board, start, pacman_y, pacman_x)
+            self.inky_movement(board, start, pacman)
         
         elif self.enemy_type == Enemy.pinky:
-            self.pinky_movement(board, start, pacman_y, pacman_x)
+            self.pinky_movement(board, start, pacman)
 
         elif self.enemy_type == Enemy.clyde:
             self.clyde_movement(board)
 
     # Inky Movement Functions #
-    def blinky_movement(self, board, start, pacman_y, pacman_x):
+    def blinky_movement(self, board, start, pacman):
         ''' Blinky's movement is to directly chase Pacman on the board. '''
-        path = self.determine_path(board, start, pacman_y, pacman_x)
+        path = self.determine_path(board, start, pacman.y, pacman.x)
         self.path_finding_direction(path)
 
     # Blinky Movement Functions #
-    def inky_movement(self, board, start, endpoint_y, endpoint_x):
+    def inky_movement(self, board, start, pacman):
         ''' Inky's movement differentiates between the other three ghost. So we use
             random() from the random library to determine which movement he will follow,
             and it will constantly be changing as time goes on. '''
@@ -83,23 +90,23 @@ class Enemy(Character):
         self._inky_and_clyde_movement_turns()
 
         if choice <= .33:
-            return self.blinky_movement(board, start, endpoint_y, endpoint_x)
+            return self.blinky_movement(board, start, pacman)
 
         elif choice <= .75:
             return self.clyde_movement(board)
 
         elif choice <= 1:
-            return self.pinky_movement(board, start, endpoint_y, endpoint_x)
+            return self.pinky_movement(board, start, pacman)
 
         
     # Pinky Movement Functions #
-    def pinky_movement(self, board, start, pacman_y, pacman_x):
-        ''' Pinky's movement is meant to ambush, so we have pacman's location
-            points to plot the best path to get in front of him. '''
+    def pinky_movement(self, board, start, pacman):
+        ''' Pinky's movement is meant to ambush, so we have the entire pacman object
+            so that are we able to look at his direction and coordinates. '''
         # --> endpoints done here
 
         # endpoints plugged below
-        path = self.determine_path(board, start, pacman_y, pacman_x)
+        path = self.determine_path(board, start, pacman.y, pacman.x)
 
         #self.path_finding_direction(path)
 
@@ -112,7 +119,6 @@ class Enemy(Character):
     def clyde_movement(self, board):
         ''' Clyde's movement is random, and he does not chase or ambush. That
             is why it is not required for him to have any endpoint arguments. '''
-        # --> endpoints done here
         choice = self.random_choice()
         self._inky_and_clyde_movement_turns()
         self.random_direction(choice)
@@ -192,8 +198,24 @@ class Enemy(Character):
         ''' Once an enemy has moved, their current location is saved, and
             then movement is called that places them in a new location. '''
         self.last_location = self.return_location()
-        self.movement()
 
+        if self.invulnerable:
+            self.movement()
+
+        else:
+            self.slowed_movement()
+
+    def slowed_movement(self):
+        ''' This movement is made so that it will move a board square ever other update. This will
+            immitate a slowed down movement, and Pacman will be capable of catching up and eating
+            an enemy at this speed. This function skips a movement call every other update. '''
+        if self.slowed_down:
+            self.slowed_down = False
+
+        else:
+            self.movement()
+            self.slowed_down = True
+    
     # Pathfinding Functions #
     def path_finding_direction(self, path):
         ''' This function is what changes the direction depending on the next location
@@ -249,7 +271,9 @@ class Enemy(Character):
 
     def _path_length(self, path) -> int:
         ''' This function is a helper function to avoid index errors depending on
-            how large the path is. '''
+            how large the path is. If the path is larger than 1, we can just get
+            the [1] index of the list for the next location. Otherwise, if it is
+            only 1, we do [0] since a list of length 1 only has that index value. '''
         if len(path) > 1:
             return 1
         else:

@@ -1,5 +1,6 @@
 from character import Character
 from enemy import Enemy
+from wall import Wall
 from pickup import Pickup
 
 class Pacman(Character):
@@ -44,7 +45,6 @@ class Pacman(Character):
             else:
                 self.score += 10
 
-        # bottom half is never happening anymore #
         elif type(gameObj) == Enemy:
             if self.invulnerable:
                 self.score += 100
