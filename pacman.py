@@ -23,13 +23,6 @@ class Pacman(Character):
 
         self.invulnerable_ticks = Pacman.ticks
         # https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
-
-    def restart_level(self):
-        ''' On death, original values are restored. '''
-        self.initial_position()
-        self.change_direction('Left')
-        self.next_direction = None
-        self.is_respawning = True
     
     # Game Progression Functions #
     def contact(self, gameObj):
@@ -54,25 +47,21 @@ class Pacman(Character):
 
         self.one_up()
 
-    def one_up(self):
-        pass
-
-    
-    def level_up(self, score, lives, level) -> None:
-        self.score, self.lives, self.level = score, lives, level
-
-    def respawn(self, images):
+    def respawn(self, images) -> None:
+        ''' When Pacman needs to respawn, the level is restarted, his image is displayed,
+            and his death attribute is no longer True. '''
         self.restart_level()
         self.direction_image( images )
         self.death = False
 
-    def lose_life(self):
-        self.lives -= 1
-        
-    def out_of_lives(self):
-        return self.lives == 0
+    def restart_level(self) -> None:
+        ''' On death, original values are restored. '''
+        self.initial_position()
+        self.change_direction('Left')
+        self.next_direction = None
+        self.is_respawning = True
 
-    def boost_picked_up(self):
+    def boost_picked_up(self) -> None:
         ''' This function checks if Pacman is invulnerable when he picks up
             a boost. If he is then the counter is refreshed and he remains
             invulnerable for a longer time. Otherwise, he becomes invulnerable
@@ -81,11 +70,29 @@ class Pacman(Character):
             self.invulnerability()
         else:
             self.invulnerable_ticks = Pacman.ticks - 1
+            
+    # Attribute Functions #
+    def one_up(self) -> None:
+        pass
     
-    def boost_running_out(self):
+    def level_up(self, score, lives, level) -> None:
+        self.score, self.lives, self.level = score, lives, level
+        
+    def lose_life(self):
+        ''' When Pacman dies, his lives attribute is decremented by one. '''
+        self.lives -= 1
+        
+    def out_of_lives(self) -> bool:
+        ''' Returns True if Pacman does not have anymore lives, otherwise false. '''
+        return self.lives == 0
+    
+    def boost_running_out(self) -> None:
+        ''' Decrements invulnerable_ticks by 1 each time an update is called. '''
         self.invulnerable_ticks -= 1
     
-    def normal_state(self):
+    def normal_state(self) -> None:
+        ''' When Pacman is not invulnerable, his ticks are refreshed to default,
+            and his invulnerable state is set to False by the invulnerability() call.'''
         self.invulnerable_ticks = Pacman.ticks
         self.invulnerability()
         
@@ -98,6 +105,7 @@ class Pacman(Character):
         return self.next_direction is not None
         
     def crossed_boundary(self):
+        ''' This function controls '''
         if self.direction == 'Left':
             self.change_location(27, 14)
         else:

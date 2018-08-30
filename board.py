@@ -10,12 +10,13 @@ class Board():
     def __init__(self, width, height, images):
         self._window_width = width
         self._window_height = height
+        self.images = images
 
         self.Gamestate = None
-        self.images = images
-        self.game_objects = set()
         self.pacman = None
         self.enemies = set()
+        self.game_objects = set()
+        
         self.game_over = False
 
     # Level Functions #
@@ -25,13 +26,24 @@ class Board():
             game_ojects set with all the objects that are on the board. And the initial location
             of Pacman is set. '''
         score, lives, level = self.current_stats()
+        self.refresh_objects(level)
+        
         self.Gamestate = Board.create_board()
         self.Gamestate = self._pacman_board( self.square_height(), self.square_width() )
+        
         self.update_board()
+        
         self.pacman = self.pacman_location()
         self.pacman.level_up(score, lives, level)
         self.enemies = { e for e in self.game_objects if type(e) == Enemy }
 
+    def refresh_objects(self, level):
+        ''' This is to refresh the board and attributes of the game when a level
+            transitions to the next. '''
+        if level > 1:
+            self.enemies = set()
+            self.game_objects = set()
+        
     def level_complete(self) -> bool:
         ''' Returns true or false if the total pickups on the board is 0.
             If 0 the level is complete, otherwise the game is still going. '''
@@ -40,16 +52,11 @@ class Board():
         return len(total_pickups) == 0
 
     def current_stats(self) -> tuple:
-        if self.Gamestate is not None: # Game has started and level transitioning
-            score = self.pacman.score
-            lives = self.pacman.lives
-            level = self.pacman.level + 1
+        # Game has already started and is transitioning to a new level
+        if self.Gamestate is not None:
+            return self.pacman.score, self.pacman.lives, self.pacman.level + 1
         else:
-            score = Pacman.no_score
-            lives = Pacman.three_lives
-            level = Pacman.level_one
-
-        return score, lives, level
+            return Pacman.no_score, Pacman.three_lives, Pacman.level_one        # (0, 3, 1)
 
     def _game_continuation(self, y, x) -> None:
         ''' Checks if Pacman is ongoing to an enemy, if so restarts the level due to death.
@@ -122,7 +129,7 @@ class Board():
     def _update_gamestate(self):
         ''' Updates the entire gamestate each time it is called. This function is in charge of
             all the character object's movement, and game states as the game progresses. '''
-        y, x = self.pacman.return_location()                         # pacman's previous updated location is stored to validate the next player movement
+        y, x = self.pacman.return_location()
         self._validate_movement(y, x)                                # pacman's movement is validated from current spot, and then pacman has a new location
         self._validate_pacman_state()                                # validates if pacman picks up a boost
         self._validate_enemy_movement(y, x)                          # enemies need to determine direction -> pacman's new location
@@ -285,7 +292,9 @@ class Board():
             calls the function check_for_gameover(). Else it's just going to update the
             board with the enemy. '''
         self._update_previous_board_square(enemy)
-        
+
+        #self.print_enemys_type_and_position(enemy)
+    
         if (enemy.y, enemy.x) == (pacman_y, pacman_x):
             self._validate_enemy_death_or_kill(enemy)
         else:
@@ -357,7 +366,7 @@ class Board():
                     if self[i][j].pickup_memory is not None:
                         new_row.append(self[i][j].pickup_memory)
                         self[i][j].discard_pickup()
-                    
+                        
                     else:
                         new_row.append(None)
                 
@@ -468,5 +477,11 @@ class Board():
                 for j in range(len(self[i])):
                     if i > 20:
                         print(type(self[i][j]), i, j)
+
+            print('-' * 50)
+
+    def print_enemys_type_and_position(self, enemy):
+        if enemy.enemy_type == 8:   
+            print(enemy.enemy_type, enemy.y, enemy.x, self.pacman.y, self.pacman.x)
 
             print('-' * 50)

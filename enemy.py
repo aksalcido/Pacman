@@ -55,7 +55,7 @@ class Enemy(Character):
             return self.breadth_first_search(board, start, endpoint_y, endpoint_x)
 
         else:
-            return self.breadth_first_search(board, start, self.starting_point[1], self.starting_point[0])[:-1]
+            return self.breadth_first_search(board, start, self.start_location[1], self.start_location[0])[:-1]
 
 
     def determineDirection(self, board, pacman):

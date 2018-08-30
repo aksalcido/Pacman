@@ -3,13 +3,13 @@ class Character():
     def __init__(self, x, y, direction):
         self.x = x
         self.y = y
-        self.speed = 1
         self.direction = direction
-        self._image = None
-        self.starting_point = x, y
+        self.speed = 1
+        self.start_location = x, y
         self.last_location = None
         self.invulnerable = False
-    
+        self._image = None
+        
     def movement(self):
         if self.direction == 'Up':
             self.y -= self.speed
@@ -27,7 +27,7 @@ class Character():
         self.invulnerable = not self.invulnerable
 
     def initial_position(self):
-        self.change_location(self.starting_point[0], self.starting_point[1])
+        self.change_location(self.start_location[0], self.start_location[1])
         
     def change_speed(self):
         pass
