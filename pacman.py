@@ -72,9 +72,6 @@ class Pacman(Character):
             self.invulnerable_ticks = Pacman.ticks - 1
             
     # Attribute Functions #
-    def one_up(self) -> None:
-        pass
-    
     def level_up(self, score, lives, level) -> None:
         self.score, self.lives, self.level = score, lives, level
         

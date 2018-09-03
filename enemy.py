@@ -26,8 +26,8 @@ class Enemy(Character):
     def discard_pickup(self):
         ''' This function is called when an enemy was holding a pickup and then discards
             it, and is used as memory. '''
-        self.on_pickup = False
         self.pickup_memory = None
+        #print('occured', self.y, self.x, self.last_location)
         
     def determine_image(self, enemy_type, images):
         ''' Image display to player is determined by which type of enemy it is. If the enemy
@@ -51,6 +51,7 @@ class Enemy(Character):
     def determine_path(self, board, start, endpoint_y, endpoint_x):
         ''' Path is towards endpoint destination if the enemy is invulnerable (the normal case).
             Otherwise, the enemy needs to retreat towards the starting location. '''
+
         if self.invulnerable:
             return self.breadth_first_search(board, start, endpoint_y, endpoint_x)
 
@@ -103,17 +104,54 @@ class Enemy(Character):
     def pinky_movement(self, board, start, pacman):
         ''' Pinky's movement is meant to ambush, so we have the entire pacman object
             so that are we able to look at his direction and coordinates. '''
-        # --> endpoints done here
-
+        # endpoints done here
+        endpoint_y, endpoint_x = self.pinky_endpoints(board, pacman)
         # endpoints plugged below
-        path = self.determine_path(board, start, pacman.y, pacman.x)
+        path = self.determine_path(board, start, endpoint_y, endpoint_x)
 
-        #self.path_finding_direction(path)
+        self.path_finding_direction(path)
 
 
-    def pinky_endpoints(self):
-        pass
+    def pinky_endpoints(self, board, pacman):
+        ''' This function primarily just returns the endpoints from the method
+            pinky_avoiding_wall. The difference is that it accounts for the direction
+            and adds a change in x or y depending on that direction. '''
+        if pacman.direction == 'Left':
+            return self.pinky_ambush(board, pacman, 0, -1)
 
+        elif pacman.direction == 'Right':
+            return self.pinky_ambush(board, pacman, 0, 1)
+    
+        elif pacman.direction == 'Up':
+            return self.pinky_ambush(board, pacman, -1, 0)
+
+        elif pacman.direction == 'Down':
+            return self.pinky_ambush(board, pacman, 1, 0)
+
+    def pinky_ambush(self, board, pacman, dy, dx) -> tuple:
+        ''' This function is used to get ahead of Pacman to ambush him.
+            The max distance to get ahead is set in the local variable
+            ambush_limit. The ambush limit is less if ahead of Pacman
+            is a wall, or the distance is not within board boundaries. '''
+        endpoint_y, endpoint_x = pacman.return_location()
+        ambush_limit = 7
+
+        for i in range(1, ambush_limit):
+            if self.pinkys_movement_not_within_board(board, endpoint_y + dy, endpoint_x + dx) or \
+                type(board[endpoint_y + dy][endpoint_x + dx]) == Wall:
+                    break
+
+            else:
+                endpoint_y += dy
+                endpoint_x += dx
+
+        return endpoint_y, endpoint_x
+
+            
+    def pinkys_movement_not_within_board(self, board, endpoint_dy, endpoint_dx) -> bool:
+        ''' Returns a boolean if the endpoints are not within the board boundaries. '''
+        return not ( ( 0 <= endpoint_dy <= len(board) - 1 ) and ( 0 <= endpoint_dx <= board.board_width() - 1) )
+    
     
     # Clyde Movement Functions #
     def clyde_movement(self, board):
@@ -125,10 +163,9 @@ class Enemy(Character):
         
         if self.valid_direction(board):
             self.enemy_moved()
-
         else:
             self.clydes_wrong_direction()
-
+            
     def clydes_wrong_direction(self):
         ''' If clyde has a wrong direction, then his movement_turns are automatically
             set to 0 so that he can make a random choice on which direction to go.
@@ -137,7 +174,8 @@ class Enemy(Character):
         if self.enemy_type == Enemy.clyde:
             self.movement_turns = 0
             self.last_choice = None
-        
+
+        self.last_location = self.return_location()
     
     def _inky_and_clyde_movement_turns(self):
         ''' Inky and clyde are the only enemy with movement_turns attribute, because

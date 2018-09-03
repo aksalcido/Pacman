@@ -107,9 +107,10 @@ class Board():
             must store a boolean if the spot it goes over has a pickup, and once the enemy
             leaves the spot, the pick up is restored. '''
         if enemy.pickup_memory is not None:
-            y, x = enemy.last_location
-            self[y][x] = enemy.pickup_memory
-            enemy.discard_pickup()
+            if self.location_has_changed(enemy, enemy.last_location):
+                y, x = enemy.last_location
+                self[y][x] = enemy.pickup_memory
+                enemy.discard_pickup()
 
     def restore_enemy(self, enemy):
         ''' This function restores the enemy by calling initial_position() to change
@@ -150,11 +151,13 @@ class Board():
             there being multiple duplicates of the game object on the board, since it replaces the
             last location with None. '''
         if game_object.last_location is not None:
-            previous_y, previous_x = game_object.last_location
-
-            if (game_object.y, game_object.x) != (previous_y, previous_x):
-                self[previous_y][previous_x] = None
-        
+            
+            if self.location_has_changed(game_object, game_object.last_location):
+                previous_y, previous_x = game_object.last_location
+                
+                if type(self[previous_y][previous_x]) != Pickup:
+                    self[previous_y][previous_x] = None
+            
             
     def update_directions(self):
         ''' This function is what allows smoother movement when wanting to change Pacman's
@@ -311,6 +314,9 @@ class Board():
             self.restore_enemy(enemy)        
         
     # Individual Game Object Size Settings #
+    def location_has_changed(self, game_object, last_location) -> bool:
+        return (game_object.y, game_object.x) != last_location
+    
     def within_bounds(self, x) -> bool:
         return x != self.board_width() - 1 and x != 0
 
@@ -482,6 +488,6 @@ class Board():
 
     def print_enemys_type_and_position(self, enemy):
         if enemy.enemy_type == 8:   
-            print(enemy.enemy_type, enemy.y, enemy.x, self.pacman.y, self.pacman.x)
+            print(enemy.enemy_type, enemy.y, enemy.x, enemy.pickup_memory)
 
             print('-' * 50)
