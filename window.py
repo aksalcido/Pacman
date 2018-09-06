@@ -90,7 +90,8 @@ class Window():
 
         elif self.board.pacman.is_respawning:
             self.board.pacman.is_respawning = False
-            self._respawn_transition()
+            self._draw_board()
+            self._master.after(550, self._respawn_transition())
             
         # Game Progress #
         else:
@@ -123,10 +124,10 @@ class Window():
     def _gameover_transition(self) -> None:
         self._bindings_enabled(False)       # bindings are disabled when game is over
         self.board.pacman._image = None     # pacman is no longer on the board, so no image required
-        self._adjust_board()
         self.gameover_screen()
 
     def _respawn_transition(self) -> None:
+        self._adjust_board()
         self.delay_beginning()
         #self.board.pacman.is_respawning = False
         
@@ -216,6 +217,7 @@ class Window():
 
         if not self._pause:
             self._adjust_board()
+
             self.board.update_directions()
             self.board.update_board()
             self._check_for_completion()

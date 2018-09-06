@@ -3,6 +3,10 @@ class Pickup():
     boostUp = 3
     
     def __init__(self, x, y, images, boost = False):
+        ''' Initializes a Pickup object that basically functions as a representation on the
+            board. There is no methods in the class, because it gets eaten by Pacman as the
+            game progresses. Due to this, it requires x and y coordinates, an image, and the
+            difference between a boost pick up or a normal one, where boost is False by default.'''
         self.x = x
         self.y = y
         self.images = images
@@ -12,18 +16,3 @@ class Pickup():
             self._image = self.images.return_image('boost')
         else:
             self._image = self.images.return_image('pickup')
-
-
-## We can use this class to represent the Pickups like the little dots, and
-## the invulnerability boost
-
-## Thinking of making the list contain a ton of class objects (pacman, enemies, and the pickups) rather than
-## just numbers, that way we can update the game by saying:
-
-## if the direction of pacman is left
-## if the object on the left of pacman, inside the board list's coordinates are the same as pacman's, then pacman will be inside that index of
-## the board
-
-## pacman.x == object.x --> pacman is inside that new index, once he leaves to the next one, maybe replaced with 'None'
-## pacman.x == enemy.x --> pacman is dead
-## etc, let me know what you think

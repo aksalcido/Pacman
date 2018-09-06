@@ -45,8 +45,6 @@ class Pacman(Character):
             else:
                 self.death = True
 
-        self.one_up()
-
     def respawn(self, images) -> None:
         ''' When Pacman needs to respawn, the level is restarted, his image is displayed,
             and his death attribute is no longer True. '''

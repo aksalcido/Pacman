@@ -6,7 +6,8 @@ from wall import Wall
 _DEBUG = False
 
 class Board():
-
+    restricted_area = [(13,11), (13,16)]
+    
     def __init__(self, width, height, images):
         self._window_width = width
         self._window_height = height
@@ -62,6 +63,7 @@ class Board():
         ''' Checks if Pacman is ongoing to an enemy, if so restarts the level due to death.
             Otherwise, checks if the game is not over, and if so updates the board square.
             Otherwise, Pacman's location become's None because the game is done. '''
+        
         if self._validate_upcoming_enemy(y, x):
             if not self.pacman.invulnerable:
                 self.check_for_gameover()
@@ -79,39 +81,52 @@ class Board():
 
             if _DEBUG:
                 #self.surrounded_print()
+                self.pacman_and_enemy_print()
                 #self.total_enemy_print()
-                self.total_board_print()
+                #self.total_board_print()
             
         else:
             self[y][x] = None
-        
+
+
+    
     def check_for_gameover(self):
         ''' This function mainly checks for the progress of Pacman. If Pacman
             dies and is out of lives, then the game is over. Otherwise, respawns
             from the original spot. If Pacman is still alive, then the board is
             just updated with his new position. '''
         self.pacman.lose_life() # Pacman loses a life on death
-
+        
         if not self.pacman.out_of_lives():
             self.restore_gamestate()
-            self._update_respawn_board()
+            self._update_board_for_respawn()
         else:
             self._game_over()
 
     def _game_over(self):
         self.game_over = True
 
-    def restore_pickup(self, enemy):
+    def restore_enemies_previous_square(self, enemy):
         ''' Restores a pickup that an enemy went over because the way the game is organized,
             requires board updation, and an enemy overwrites a spot. Due to this, the enemy
             must store a boolean if the spot it goes over has a pickup, and once the enemy
             leaves the spot, the pick up is restored. '''
-        if enemy.pickup_memory is not None:
-            if self.location_has_changed(enemy, enemy.last_location):
-                y, x = enemy.last_location
+        if self.has_last_location(enemy):
+            self._enemy_new_location(enemy)
+                
+    def _enemy_new_location(self, enemy):
+        ''' Checks for the enemies new location, and whether it was a pickup. If not, then
+            the board is just replaced with None, otherwise it is replaced with the Pickup.'''
+        y, x = enemy.last_location
+
+        if self.location_has_changed(enemy, enemy.last_location):
+            if enemy.pickup_memory is not None:
                 self[y][x] = enemy.pickup_memory
                 enemy.discard_pickup()
 
+            else:
+                self[y][x] = None
+    
     def restore_enemy(self, enemy):
         ''' This function restores the enemy by calling initial_position() to change
             the enemy's y and x to original values. Then the board is updated with
@@ -133,32 +148,28 @@ class Board():
         y, x = self.pacman.return_location()
         self._validate_movement(y, x)                                # pacman's movement is validated from current spot, and then pacman has a new location
         self._validate_pacman_state()                                # validates if pacman picks up a boost
-        self._validate_enemy_movement(y, x)                          # enemies need to determine direction -> pacman's new location
-        self._game_continuation(y, x)                                 # checks for death, game over, and updates Pacman's previous board square
+        self._validate_enemy_movement(y, x)                         # enemies need to determine direction -> pacman's new location
+        self._game_continuation(y, x)                                # checks for death, game over, and updates Pacman's previous board square
 
     def _update_board_square(self, y, x):
         ''' Updates the last spot that Pacman was in and makes it None, this is specifically
             aimed to assist at updating the board while removing the Pickups when Pacman
             goes over them. Then, the Gamestate is updating with Pacman's new location. '''
         self._update_previous_board_square(self.pacman)
-
         self[y][x] = self.pacman
-
         
     def _update_previous_board_square(self, game_object):
         ''' Updates the previous board square that the game object was in. This only occurs after
             the game object has actually moved ( meaning after first update ). This function avoids
             there being multiple duplicates of the game object on the board, since it replaces the
             last location with None. '''
-        if game_object.last_location is not None:
-            
+        if self.has_last_location(game_object):
             if self.location_has_changed(game_object, game_object.last_location):
                 previous_y, previous_x = game_object.last_location
-                
-                if type(self[previous_y][previous_x]) != Pickup:
+
+                if type(self[previous_y][previous_x]) == None:
                     self[previous_y][previous_x] = None
-            
-            
+
     def update_directions(self):
         ''' This function is what allows smoother movement when wanting to change Pacman's
             direction. It checks if Pacman has queue'd another direction that wasn't possible
@@ -172,7 +183,7 @@ class Board():
             self.pacman.movement()
 
                 
-    def _update_respawn_board(self):
+    def _update_board_for_respawn(self):
         ''' When pacman is respawning, Pacman and all the enemies are put in their
             original starting position. '''
         self._update_enemy_respawns()      
@@ -200,18 +211,12 @@ class Board():
         ''' Enemy has moved, and now restores pickup if the enemy last touched one.
             Checks if the new location contains a pickup, and then if so stores
             the memory of that pickup. Then the board is updated with the enemy. '''
-        self.restore_pickup(enemy)
+        self.restore_enemies_previous_square(enemy)
             
         if type(self[enemy.y][enemy.x]) == Pickup:
             enemy.pickup_memory = self[enemy.y][enemy.x]
 
         self[enemy.y][enemy.x] = enemy
-    
-    def pacman_location(self) -> Pacman:
-        ''' Returns the Pacman object on the board. '''
-        for game_obj in self.game_objects:
-            if type(game_obj) == Pacman:
-                return game_obj
 
     # Direction Validation Functions #
     def validate_path(self, direction) -> bool:
@@ -223,15 +228,14 @@ class Board():
         if direction == 'Left':
             return type(self[y][x - 1]) != Wall
 
-        elif direction == 'Right': 
+        elif direction == 'Right':
             return type(self[y][x + 1]) != Wall
 
         elif direction == 'Down':
-            return type(self[y + 1][x]) != Wall
+            return type(self[y + 1][x]) != Wall and (y + 1, x) not in Board.restricted_area
 
         elif direction == 'Up':
             return type(self[y - 1][x]) != Wall
-
 
     def _validate_pacman_state(self):
         ''' Checks if Pacman is invulnerable, if he is then the special case
@@ -256,8 +260,21 @@ class Board():
             a boolean if there is an enemy directly in front of him,
             which results in a death if True. '''
         if self.within_bounds(x):
-            return type(self[y][x]) == Enemy
+            return self._validate_past_enemy()
 
+    def _validate_past_enemy(self):
+        ''' Validates if Pacman's last location is an enemy, since this is only possible if
+            they past right by each other. '''
+        if self.has_last_location(self.pacman):
+            dy, dx = self.pacman.last_location
+            return type(self[dy][dx]) == Enemy
+    
+    
+    def _validate_upcoming_enemy_in_square(self, game_object, previous_y, previous_x):
+        return type(game_object) == Pacman and type(self[previous_y][previous_x]) == Enemy and \
+               not game_object.invulnerable
+           
+    
     def _validate_movement(self, y, x):
         '''
         Checks for the case that Pacman crosses to the other side via one side,
@@ -295,11 +312,10 @@ class Board():
             calls the function check_for_gameover(). Else it's just going to update the
             board with the enemy. '''
         self._update_previous_board_square(enemy)
-
-        #self.print_enemys_type_and_position(enemy)
-    
+        
         if (enemy.y, enemy.x) == (pacman_y, pacman_x):
             self._validate_enemy_death_or_kill(enemy)
+        
         else:
             self._update_enemy_movement(enemy)
 
@@ -311,11 +327,22 @@ class Board():
             self.check_for_gameover()
         else:
             self.pacman.contact(enemy)
-            self.restore_enemy(enemy)        
-        
-    # Individual Game Object Size Settings #
+            self.restore_enemy(enemy)       
+    
+
+    # Individual Game Object Settings #
+    def pacman_location(self) -> Pacman:
+        ''' Returns the Pacman object on the board. '''
+        for game_obj in self.game_objects:
+            if type(game_obj) == Pacman:
+                return game_obj
+    
     def location_has_changed(self, game_object, last_location) -> bool:
         return (game_object.y, game_object.x) != last_location
+
+    def has_last_location(self, game_object) -> bool:
+        ''' Returns True if the game object has a last location, otherwise False. '''
+        return game_object.last_location is not None
     
     def within_bounds(self, x) -> bool:
         return x != self.board_width() - 1 and x != 0
@@ -468,6 +495,18 @@ class Board():
 
         print('-' * 50)
 
+    def pacman_and_enemy_print(self):
+        print('Pacman: ', self.pacman.y, self.pacman.x)
+
+        for e in self.enemies:
+            if e.enemy_type == 7:
+                print('Enemy: ', e.y, e.x, 'Type: ', type(self[e.y][e.x]))
+                print('Pacman: ', self.pacman.y, self.pacman.x)
+
+
+        print('-' * 50)
+
+        
     def total_enemy_print(self):
         for i in range(len(self)):
             for j in range(len(self[i])):
@@ -478,16 +517,16 @@ class Board():
 
 
     def total_board_print(self):
-        if self.pacman.level == 2:
+        if self.pacman.level == 1 and self.pacman.direction == 'Down':
             for i in range(len(self)):
                 for j in range(len(self[i])):
-                    if i > 20:
+                    if 10 < i < 22:
                         print(type(self[i][j]), i, j)
 
             print('-' * 50)
 
     def print_enemys_type_and_position(self, enemy):
-        if enemy.enemy_type == 8:   
+        if enemy.enemy_type == 7:   
             print(enemy.enemy_type, enemy.y, enemy.x, enemy.pickup_memory)
 
             print('-' * 50)
