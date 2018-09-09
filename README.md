@@ -18,3 +18,6 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 
 <h4> Other </h4>
 `esc` -> Pauses the Game <br />
+
+
+# Header #
