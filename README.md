@@ -8,4 +8,9 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 `collections.deque` - Data structure required in the Breadth First-Search Algorithm, which was required to for the enemies pathfinding.<br />
 `random` - Allowed random movement for certain enemies that had their own unique movement.<br />
 
-# 
+# Instructions / Hot Keys
+<h4> Movement </h4>
+`W` -> Upward Movement        <br />
+`A` -> Leftward Movement      <br />
+`D` -> Downward Movement      <br />
+`S` -> Rightward Movement     <br />
