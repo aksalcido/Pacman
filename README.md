@@ -10,7 +10,11 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 
 # Instructions / Hot Keys
 <h4> Movement </h4>
+
 `W` -> Upward Movement        <br />
 `A` -> Leftward Movement      <br />
 `D` -> Downward Movement      <br />
 `S` -> Rightward Movement     <br />
+
+<h4> Other </h4>
+`esc` -> Pauses the Game <br />
