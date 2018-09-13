@@ -22,6 +22,7 @@ class Pacman(Character):
         self.direction_image(images)
 
         self.invulnerable_ticks = Pacman.ticks
+        
         # https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
     
     # Game Progression Functions #

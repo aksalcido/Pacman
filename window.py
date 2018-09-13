@@ -60,7 +60,8 @@ class Window():
                                            game_obj.y * total_height + (total_height / 2), image = game_obj._image)
 
 
-    def _draw_interface(self) -> None:
+    def _draw_stats(self) -> None:
+        ''' Draws the statistics of Pacman for the player to see. '''
         self._score_label['text'] = self.board.pacman.display_score()
         self._level_label['text'] = self.board.pacman.display_level()
         self._lives_label['text'] = self.board.pacman.display_lives()
@@ -69,10 +70,7 @@ class Window():
         ''' Deletes the board and then redraws to prevent animation overlapping. '''
         self._canvas.delete(tk.ALL)
         self._draw_board()
-        self._draw_interface()
-
-    def _draw_pacman(self) -> None: # not used right now
-        self._canvas.move(self._pacman, 1, 0)
+        self._draw_stats()
 
     # Level Completion / Transitioning Functions #
     def _check_for_completion(self) -> None:
@@ -105,6 +103,7 @@ class Window():
         self._canvas.after(750, self.loading_screen)
 
     def loading_screen(self) -> None:
+        ''' Adds a loading screen transition in between levels. '''
         self._canvas.delete(tk.ALL)
         self._canvas.create_image( self._width / 2, self._height / 2,
                                    image = self._images.return_image('loading_screen') )
@@ -126,10 +125,12 @@ class Window():
         self.board.pacman._image = None     # pacman is no longer on the board, so no image required
         self.gameover_screen()
 
+        
     def _respawn_transition(self) -> None:
+        ''' Allows a transition to be in between respawning so that the game does not
+            continue too quickly. '''
         self._adjust_board()
         self.delay_beginning()
-        #self.board.pacman.is_respawning = False
         
         self._master.after(2100, self.update)
         
@@ -216,11 +217,12 @@ class Window():
         '''
 
         if not self._pause:
-            self._adjust_board()
-
             self.board.update_directions()
             self.board.update_board()
             self._check_for_completion()
+
+            if not self.board.game_over:
+                self._adjust_board()
             
         else:
             self._canvas.create_image(self._width / 2, self._height / 2,

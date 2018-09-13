@@ -28,6 +28,7 @@ class Character():
         elif self.direction == 'Left':
             self.x -= self.speed
 
+    
     def invulnerability(self) -> None:
         ''' Makes the invulnerable attribute the opposite of what it currently is.
             Called twice, when a boost is eaten, and then after certain amount of
