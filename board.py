@@ -79,8 +79,9 @@ class Board():
             self._update_board_square(y, x)
 
             if _DEBUG:
+                pass
                 #self.surrounded_print()
-                self.pacman_and_enemy_print()
+                #self.pacman_and_enemy_print()
                 #self.total_enemy_print()
                 #self.total_board_print()
             

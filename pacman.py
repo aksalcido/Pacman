@@ -22,8 +22,6 @@ class Pacman(Character):
         self.direction_image(images)
 
         self.invulnerable_ticks = Pacman.ticks
-        
-        # https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
     
     # Game Progression Functions #
     def contact(self, gameObj):
@@ -93,11 +91,13 @@ class Pacman(Character):
         self.invulnerability()
         
     # Direction Functions #
-    def change_direction(self, direction):
+    def change_direction(self, direction) -> None:
+        ''' Changes the direction of Pacman with a given direction argument. '''
         self.last_direction = self.direction
         self.direction = direction
     
-    def has_upcoming_direction(self):
+    def has_upcoming_direction(self) -> bool:
+        ''' If next_direction has a direction, it returns True, else False. '''
         return self.next_direction is not None
         
     def crossed_boundary(self):

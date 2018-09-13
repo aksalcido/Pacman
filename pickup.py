@@ -10,7 +10,7 @@ class Pickup():
         self.x = x
         self.y = y
         self.images = images
-        self.boost = boost # default = false since only 4 boost and much more food
+        self.boost = boost # default = false since only 4 boost are on the board
         
         if self.boost:
             self._image = self.images.return_image('boost')

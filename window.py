@@ -16,7 +16,7 @@ class Window():
         self._master = master
         self._width = 1000
         self._height = 850
-        self._images = GameImage()      # All images used for Pacman are stored as a GameImage() object
+        self._images = GameImage()      # All images used for the game are stored as a GameImage() object
 
         # All Tkinter Settings Initialized #
         self._canvas = tk.Canvas(self._master, width = self._width, height = self._height, background="black")
