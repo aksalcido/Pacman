@@ -107,9 +107,7 @@ class Enemy(Character):
     def pinky_movement(self, board, start, pacman):
         ''' Pinky's movement is meant to ambush, so we have the entire pacman object
             so that are we able to look at his direction and coordinates. '''
-        # endpoints done here
         endpoint_y, endpoint_x = self.pinky_endpoints(board, pacman)
-        # endpoints plugged below
         path = self.determine_path(board, start, endpoint_y, endpoint_x)
 
         self.path_finding_direction(path)
