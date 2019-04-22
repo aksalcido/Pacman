@@ -21,6 +21,12 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 
 
 # Demonstration #
+
+## Acquiring Points and Boost
 <img src='boost.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
-<img src='transition.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+## Gameplay
 <img src='gameplay.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+## Transition between Levels
+<img src='transition.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
