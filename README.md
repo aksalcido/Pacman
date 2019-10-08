@@ -21,10 +21,13 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 `esc` -> Pauses the Game <br />
 
 <h4> Enemy Movement </h4>
-<img src='/images/blinky.png' title='' width='' alt='' /> testing here
-<img src='/images/pinky.png' title='' width='' alt='' />
-<img src='/images/inky.png' title='' width='' alt='' />
-<img src='/images/clyde.png' title='' width='' alt='' />
+<img src='/images/blinky.png' title='' width='' alt='' /> Blinky attempts to chsae Pacman from behind.
+<img src='/images/pinky.png' title='' width='' alt='' /> Pinky attempts to ambush Pacman from the front, depending on the position can
+lead to Pinky chasing from behind.
+<img src='/images/clyde.png' title='' width='' alt='' /> Clyde has completely random movement on the board.
+<img src='/images/inky.png' title='' width='' alt='' /> Inky can have an equal chance of any of the previous Ghost's movement for
+any duration amount of time.
+
 
 
 # Demonstration #
