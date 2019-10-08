@@ -21,7 +21,7 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 `esc` -> Pauses the Game <br />
 
 <h4> Enemy Movement </h4>
-<img src='/images/blinky.png' title='' width='' alt='' /> Blinky attempts to chsae Pacman from behind.
+<img src='/images/blinky.png' title='' width='' alt='' /> Blinky attempts to chase Pacman from directly behind.
 <img src='/images/pinky.png' title='' width='' alt='' /> Pinky attempts to ambush Pacman from the front, depending on the position can
 lead to Pinky chasing from behind.
 <img src='/images/clyde.png' title='' width='' alt='' /> Clyde has completely random movement on the board.
