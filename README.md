@@ -16,6 +16,9 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 `D` -> Downward Movement      <br />
 `S` -> Rightward Movement     <br />
 
+- test
+<img src='/images/blinky.png' title='' width='' alt='' />
+
 <h4> Other </h4>
 `esc` -> Pauses the Game <br />
 
