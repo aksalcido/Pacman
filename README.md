@@ -11,6 +11,7 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 # Instructions / Hot Keys
 <h4> Movement </h4>
 
+<h4> Player Movement </h4>
 `W` -> Upward Movement        <br />
 `A` -> Leftward Movement      <br />
 `D` -> Downward Movement      <br />
@@ -19,6 +20,7 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 <h4> Other </h4>
 `esc` -> Pauses the Game <br />
 
+<h4> Enemy Movement </h4>
 <img src='/images/blinky.png' title='' width='' alt='' />: can i type here <br />
 <img src='/images/pinky.png' title='' width='' alt='' />: can i type here <br />
 <img src='/images/inky.png' title='' width='' alt='' />: can i type here <br />
