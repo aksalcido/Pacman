@@ -16,11 +16,13 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 `D` -> Downward Movement      <br />
 `S` -> Rightward Movement     <br />
 
-- test
-<img src='/images/blinky.png' title='' width='' alt='' />
-
 <h4> Other </h4>
 `esc` -> Pauses the Game <br />
+
+<img src='/images/blinky.png' title='' width='' alt='' />: can i type here <br />
+<img src='/images/pinky.png' title='' width='' alt='' />: can i type here <br />
+<img src='/images/inky.png' title='' width='' alt='' />: can i type here <br />
+<img src='/images/clyde.png' title='' width='' alt='' />: can i type here <br />
 
 
 # Demonstration #
