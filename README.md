@@ -21,10 +21,10 @@ A Python influenced-version of the well known arcade game, Pacman. The game imme
 `esc` -> Pauses the Game <br />
 
 <h4> Enemy Movement </h4>
-<img src='/images/blinky.png' title='' width='' alt='' />: can i type here 
-<img src='/images/pinky.png' title='' width='' alt='' />: can i type here
-<img src='/images/inky.png' title='' width='' alt='' />: can i type here
-<img src='/images/clyde.png' title='' width='' alt='' />: can i type here
+<img src='/images/blinky.png' title='' width='' alt='' /> testing here
+<img src='/images/pinky.png' title='' width='' alt='' />
+<img src='/images/inky.png' title='' width='' alt='' />
+<img src='/images/clyde.png' title='' width='' alt='' />
 
 
 # Demonstration #
