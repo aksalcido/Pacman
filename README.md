@@ -35,7 +35,7 @@ any duration amount of time.
 <img src='static/gifs/boost.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 ## Gameplay
-<img src='static/gifs/ameplay2.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='static/gifs/gameplay2.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 ## Level Completion and Transitioning
 <img src='static/gifs/transition.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
