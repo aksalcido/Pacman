@@ -9,7 +9,7 @@ class GameImage():
             through all of the images inside the 'images' directory. This makes all of the
             images available from different directories. '''
         self.start_directory = os.getcwd()
-        self.image_directory = f'{self.start_directory}\\images'
+        self.image_directory = f'..\\static\\images'
         self.game_images = dict()
     
         for image in os.listdir( self.image_directory ):

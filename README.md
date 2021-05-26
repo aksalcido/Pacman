@@ -29,17 +29,16 @@ lead to Pinky chasing from behind.
 any duration amount of time.
 
 
-
 # Demonstration #
 
 ## Acquiring Points and Boost
-<img src='boost.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='static/gifs/boost.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 ## Gameplay
-<img src='gameplay2.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='static/gifs/ameplay2.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 ## Level Completion and Transitioning
-<img src='transition.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='static/gifs/transition.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 ## Gameover
-<img src='gameover.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='static/gifs/gameover.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
